@@ -1,0 +1,262 @@
+"use client";
+
+import { useState } from "react";
+import { Header } from "@/components/layout/header";
+import { Footer } from "@/components/layout/footer";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Calendar, MapPin, Users, Clock, ArrowRight, Check } from "lucide-react";
+
+// Dummy-data för aktiviteter
+const dummyEvents = [
+  {
+    id: "1",
+    title: "Dörrknackning Södermalm",
+    date: "2026-03-08",
+    time: "10:00 - 14:00",
+    location: "Medborgarplatsen, Stockholm",
+    description: "Kampanjdag 8 mars - hjälp till att sprida budskapet genom dörrknackning.",
+    spots: 15,
+    spotsLeft: 8,
+  },
+  {
+    id: "2",
+    title: "Informationsmöte Online",
+    date: "2026-03-15",
+    time: "18:00 - 19:30",
+    location: "Zoom",
+    description: "Lär dig mer om marknadshyror och hur du kan engagera dig i kampanjen.",
+    spots: 50,
+    spotsLeft: 32,
+  },
+  {
+    id: "3",
+    title: "Flygbladsutdelning Göteborg",
+    date: "2026-04-15",
+    time: "11:00 - 15:00",
+    location: "Brunnsparken, Göteborg",
+    description: "Dela ut flygblad och prata med förbipasserande om vikten av att stoppa marknadshyror.",
+    spots: 20,
+    spotsLeft: 12,
+  },
+];
+
+function formatDate(dateStr: string) {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString("sv-SE", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+export default function AktiviteterPage() {
+  const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [registeredEvents, setRegisteredEvents] = useState<string[]>([]);
+
+  const handleRegister = async (eventId: string) => {
+    setIsSubmitting(true);
+
+    // TODO: Implementera Brevo-integration
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    console.log("Anmälan till event:", eventId, formData);
+    setRegisteredEvents([...registeredEvents, eventId]);
+    setSelectedEvent(null);
+    setIsSubmitting(false);
+    setFormData({ firstName: "", lastName: "", email: "", phone: "" });
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+
+      <main className="flex-1">
+        {/* Hero */}
+        <section className="bg-hgf-blue py-16 md:py-24 text-center text-white">
+          <div className="container-narrow">
+            <span className="badge bg-white/20 text-white mb-4">Aktiviteter</span>
+            <h1 className="text-white mb-4">Kommande aktiviteter</h1>
+            <p className="text-xl text-white/90 max-w-xl mx-auto">
+              Delta i kampanjaktiviteter nära dig. Träffa andra engagerade
+              och gör skillnad tillsammans.
+            </p>
+          </div>
+        </section>
+
+        {/* Event-lista */}
+        <section className="section bg-hgf-bg-light-blue">
+          <div className="container-page">
+            <div className="grid gap-6 max-w-3xl mx-auto">
+              {dummyEvents.map((event) => {
+                const isRegistered = registeredEvents.includes(event.id);
+
+                return (
+                  <Card key={event.id} className="overflow-hidden">
+                    <div className="md:flex">
+                      {/* Datum-badge */}
+                      <div className="bg-hgf-red text-white p-6 md:p-8 md:w-36 flex flex-col items-center justify-center text-center shrink-0">
+                        <span className="text-4xl font-bold">
+                          {new Date(event.date).getDate()}
+                        </span>
+                        <span className="text-sm uppercase tracking-wide">
+                          {new Date(event.date).toLocaleDateString("sv-SE", {
+                            month: "short",
+                          })}
+                        </span>
+                      </div>
+
+                      <div className="flex-1 p-6 md:p-8">
+                        <CardHeader className="p-0 mb-4">
+                          <CardTitle className="text-xl">{event.title}</CardTitle>
+                          <CardDescription className="text-base mt-1">{event.description}</CardDescription>
+                        </CardHeader>
+                        <CardContent className="p-0">
+                          <div className="flex flex-wrap gap-4 text-sm text-hgf-black/70 mb-6">
+                            <span className="inline-flex items-center gap-1.5">
+                              <Calendar className="h-4 w-4 text-hgf-blue" />
+                              {formatDate(event.date)}
+                            </span>
+                            <span className="inline-flex items-center gap-1.5">
+                              <Clock className="h-4 w-4 text-hgf-blue" />
+                              {event.time}
+                            </span>
+                            <span className="inline-flex items-center gap-1.5">
+                              <MapPin className="h-4 w-4 text-hgf-blue" />
+                              {event.location}
+                            </span>
+                            <span className="inline-flex items-center gap-1.5">
+                              <Users className="h-4 w-4 text-hgf-blue" />
+                              {event.spotsLeft} platser kvar
+                            </span>
+                          </div>
+
+                          {isRegistered ? (
+                            <div className="inline-flex items-center gap-2 text-hgf-blue font-medium">
+                              <span className="w-6 h-6 rounded-full bg-hgf-blue text-white flex items-center justify-center">
+                                <Check className="h-4 w-4" />
+                              </span>
+                              Du är anmäld!
+                            </div>
+                          ) : selectedEvent === event.id ? (
+                            <form
+                              onSubmit={(e) => {
+                                e.preventDefault();
+                                handleRegister(event.id);
+                              }}
+                              className="space-y-4 pt-6 border-t border-hgf-neutral animate-fade-in"
+                            >
+                              <div className="grid grid-cols-2 gap-4">
+                                <Input
+                                  placeholder="Förnamn"
+                                  value={formData.firstName}
+                                  onChange={(e) =>
+                                    setFormData({ ...formData, firstName: e.target.value })
+                                  }
+                                  required
+                                />
+                                <Input
+                                  placeholder="Efternamn"
+                                  value={formData.lastName}
+                                  onChange={(e) =>
+                                    setFormData({ ...formData, lastName: e.target.value })
+                                  }
+                                  required
+                                />
+                              </div>
+                              <div className="grid grid-cols-2 gap-4">
+                                <Input
+                                  type="email"
+                                  placeholder="E-post"
+                                  value={formData.email}
+                                  onChange={(e) =>
+                                    setFormData({ ...formData, email: e.target.value })
+                                  }
+                                  required
+                                />
+                                <Input
+                                  type="tel"
+                                  placeholder="Telefon"
+                                  value={formData.phone}
+                                  onChange={(e) =>
+                                    setFormData({ ...formData, phone: e.target.value })
+                                  }
+                                />
+                              </div>
+                              <div className="flex gap-2">
+                                <Button type="submit" variant="red" loading={isSubmitting}>
+                                  Bekräfta anmälan
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  onClick={() => setSelectedEvent(null)}
+                                >
+                                  Avbryt
+                                </Button>
+                              </div>
+                            </form>
+                          ) : (
+                            <Button
+                              onClick={() => setSelectedEvent(event.id)}
+                              variant="red"
+                            >
+                              Anmäl dig
+                              <ArrowRight className="ml-2 h-4 w-4" />
+                            </Button>
+                          )}
+                        </CardContent>
+                      </div>
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+
+            {/* Inga aktiviteter-meddelande */}
+            {dummyEvents.length === 0 && (
+              <Card className="max-w-lg mx-auto text-center p-8">
+                <Calendar className="h-12 w-12 text-hgf-neutral-dark mx-auto mb-4" />
+                <CardTitle className="mb-2">Inga aktiviteter just nu</CardTitle>
+                <CardDescription>
+                  Det finns inga planerade aktiviteter i din region just nu.
+                  Registrera dig som aktiv medlem för att få besked när nya aktiviteter planeras.
+                </CardDescription>
+                <Button className="mt-4" variant="red" asChild>
+                  <a href="/bli-aktiv">Bli aktiv medlem</a>
+                </Button>
+              </Card>
+            )}
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="bg-hgf-navy py-16 text-center text-white">
+          <div className="container-narrow">
+            <h2 className="text-white mb-4">Vill du arrangera en aktivitet?</h2>
+            <p className="text-white/80 text-lg mb-8 max-w-lg mx-auto">
+              Bli aktiv medlem och hjälp till att planera kampanjaktiviteter i ditt område.
+            </p>
+            <Button variant="white" asChild>
+              <a href="/bli-aktiv">
+                Bli aktiv medlem
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </a>
+            </Button>
+          </div>
+        </section>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}

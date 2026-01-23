@@ -43,3 +43,6 @@ next-env.d.ts
 # generation logs
 /logs/*.json
 !/logs/README.md
+
+# specstory
+.specstory/

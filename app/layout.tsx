@@ -1,35 +1,24 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: {
-    default: "HGF Valkampanj | Hyresgästföreningen",
-    template: "%s | HGF Valkampanj",
+    default: "Stoppa marknadshyror | Hyresgästföreningen",
+    template: "%s | Stoppa marknadshyror",
   },
-  description: "Hyresgästföreningens valkampanjsida. Engagera dig i bostadspolitiken och gör din röst hörd.",
+  description: "Säg nej till marknadshyror. Skriv under uppropet och engagera dig i kampen för rimliga hyror inför valet 2026.",
   keywords: [
+    "stoppa marknadshyror",
+    "marknadshyror",
     "Hyresgästföreningen",
     "HGF",
     "valkampanj",
     "val 2026",
     "bostadspolitik",
     "hyresrätt",
-    "bostad",
+    "rimliga hyror",
     "hyresgäst",
-    "bostadsfrågor",
-    "politisk påverkan"
+    "bostadsfrågor"
   ],
   authors: [{ name: "Hyresgästföreningen" }],
   creator: "Hyresgästföreningen",
@@ -42,22 +31,22 @@ export const metadata: Metadata = {
     type: "website",
     locale: "sv_SE",
     url: "https://hgf-valkampanj.se",
-    siteName: "HGF Valkampanj",
-    title: "HGF Valkampanj | Hyresgästföreningen",
-    description: "Hyresgästföreningens valkampanjsida. Engagera dig i bostadspolitiken och gör din röst hörd.",
+    siteName: "Stoppa marknadshyror",
+    title: "Stoppa marknadshyror | Hyresgästföreningen",
+    description: "Säg nej till marknadshyror. Skriv under uppropet och engagera dig i kampen för rimliga hyror inför valet 2026.",
     images: [
       {
         url: "/assets/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "HGF Valkampanj - Hyresgästföreningen",
+        alt: "Stoppa marknadshyror - Hyresgästföreningen",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "HGF Valkampanj | Hyresgästföreningen",
-    description: "Hyresgästföreningens valkampanjsida. Engagera dig i bostadspolitiken och gör din röst hörd.",
+    title: "Stoppa marknadshyror | Hyresgästföreningen",
+    description: "Säg nej till marknadshyror. Skriv under uppropet och engagera dig i kampen för rimliga hyror inför valet 2026.",
     images: ["/assets/og-image.jpg"],
     creator: "@hyaboratt",
   },
@@ -82,11 +71,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="sv" className="overflow-x-hidden">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
-      >
+      <body className="antialiased overflow-x-hidden">
         {children}
-        <Analytics />
       </body>
     </html>
   );

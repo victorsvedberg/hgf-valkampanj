@@ -1,232 +1,213 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* ═══════════════════════════════════════════════════════════
+   HGF Valkampanj - Design System
+   ═══════════════════════════════════════════════════════════ */
+
+/* Fonts - HyraSans */
 @font-face {
-  font-family: "Jakarta Sans";
-  src: url("/assets/JakartaSans-VariableFont.ttf") format("truetype");
-  font-weight: 100 900;
+  font-family: "HyraSans";
+  src: url("/assets/hyrasans-regular.woff2") format("woff2");
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Inter Variable";
-  src: url("/assets/inter-variable.ttf") format("truetype");
-  font-weight: 100 900;
+  font-family: "HyraSans";
+  src: url("/assets/hyrasans-bold.woff2") format("woff2");
+  font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 
+@font-face {
+  font-family: "HyraSansDisplay";
+  src: url("/assets/hyrasans-display.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "HyraSansText";
+  src: url("/assets/hyrasanstext-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "HyraSansText";
+  src: url("/assets/hyrasanstext-regularitalic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Custom dark mode variant */
 @custom-variant dark (&:is(.dark *));
 
+/* ═══════════════════════════════════════════════════════════
+   Theme Configuration - HGF Brand Colors
+   ═══════════════════════════════════════════════════════════ */
+
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  /* HGF Brand Colors */
+  --color-hgf-red: #FF0037;
+  --color-hgf-red-dark: #CC002C;
+  --color-hgf-black: #1A1A1A;
+  --color-hgf-white: #FFFFFF;
+
+  /* Action Colors (knappar & länkar) */
+  --color-hgf-blue: #231FD8;
+  --color-hgf-blue-dark: #06007E;
+  --color-hgf-navy: #0D1B4C;
+
+  /* Background Colors */
+  --color-hgf-bg: #FFFFFF;
+  --color-hgf-bg-light-blue: #EBF3FF;
+  --color-hgf-bg-blue: #D8E8FF;
+  --color-hgf-bg-pink: #FFF5FB;
+  --color-hgf-neutral: #E5E5E5;
+  --color-hgf-neutral-dark: #999999;
+  --color-hgf-border: #ECE8E4;
+
+  /* Functional Colors */
+  --color-hgf-warning: #FFE988;
+  --color-hgf-green: #71b942;
+
+  /* Semantic colors */
+  --color-background: var(--color-hgf-bg);
+  --color-foreground: var(--color-hgf-black);
+  --color-primary: var(--color-hgf-blue);
+  --color-primary-foreground: var(--color-hgf-white);
+
+  /* Typography */
+  --font-sans: "HyraSans", system-ui, -apple-system, sans-serif;
+  --font-display: "HyraSansDisplay", system-ui, -apple-system, sans-serif;
+  --font-text: "HyraSansText", "HyraSans", system-ui, -apple-system, sans-serif;
+
+  /* Spacing & Radius */
+  --radius-sm: 0.3rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-pill: 2em;
+  --radius-full: 9999px;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   Base Styles
+   ═══════════════════════════════════════════════════════════ */
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --radius: 0.5rem;
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-hgf-neutral;
   }
+
+  html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-hgf-bg text-hgf-black;
+    line-height: 1.6;
+    font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  }
+
+  /* Typography defaults - Fluid sizing */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold text-hgf-black leading-tight;
+    font-family: var(--font-display);
+  }
+
+  h1 {
+    font-size: clamp(1.688rem, 1.2rem + 2.5vw, 3.75rem);
+  }
+
+  /* HGF brand: röd kursiv H1 */
+  h1.brand {
+    @apply text-hgf-red italic;
+  }
+
+  h2 {
+    font-size: clamp(1.438rem, 1rem + 2vw, 3rem);
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl;
+  }
+
+  h4 {
+    @apply text-xl md:text-2xl;
+  }
+
+  p {
+    @apply text-base text-hgf-black/80;
+  }
+
+  /* Links - blue by default, but can be overridden with explicit classes */
+  a:not([class*="text-"]) {
+    @apply text-hgf-blue hover:text-hgf-blue-dark transition-colors;
   }
 }
 
-/* Custom animations for loading states */
-@keyframes bounce-once {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+/* ═══════════════════════════════════════════════════════════
+   Utility Classes
+   ═══════════════════════════════════════════════════════════ */
+
+/* Container - Max 1375px som huvudsajten */
+.container-page {
+  max-width: 1375px;
+  @apply mx-auto px-6 md:px-12;
 }
 
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+.container-narrow {
+  @apply max-w-3xl mx-auto px-6 md:px-12;
 }
 
-@keyframes fade-in-out {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
+/* Section spacing */
+.section {
+  @apply py-16 md:py-24;
 }
 
-@keyframes breathing {
-  0%, 100% { 
-    transform: scale(1); 
-    opacity: 1;
-  }
-  50% { 
-    transform: scale(1.1); 
-    opacity: 0.9;
-  }
+.section-sm {
+  @apply py-8 md:py-12;
 }
 
-@keyframes breathing-slow {
-  0%, 100% { 
-    transform: scale(1); 
-    opacity: 0.3;
-  }
-  50% { 
-    transform: scale(1.2); 
-    opacity: 0.1;
-  }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-}
-
-@keyframes shimmer-slow {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(200%); }
-}
+/* ═══════════════════════════════════════════════════════════
+   Animations
+   ═══════════════════════════════════════════════════════════ */
 
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
-.animate-bounce-once {
-  animation: bounce-once 0.5s ease-in-out;
-}
-
-.animate-shimmer {
-  animation: shimmer 2s infinite;
-}
-
-.animate-fade-in-out {
-  animation: fade-in-out 3s infinite;
-}
-
-.animate-breathing {
-  animation: breathing 2s ease-in-out infinite;
-}
-
-.animate-breathing-slow {
-  animation: breathing-slow 3s ease-in-out infinite;
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-.animate-shimmer-slow {
-  animation: shimmer-slow 3s ease-in-out infinite;
-}
-
-.animate-fade-in {
-  animation: fade-in 0.5s ease-in;
-}
-
-/* Sidebar slide-in animation */
-@keyframes slideInFromRight {
+@keyframes fade-in-up {
   from {
     opacity: 0;
-    transform: translateX(10px);
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
   }
   to {
     opacity: 1;
@@ -234,185 +215,123 @@
   }
 }
 
-/* ═══════════════════════════════════════════════════════════
-   Overview List - Lektionsöversikt
-   ═══════════════════════════════════════════════════════════ */
-
-.overview-grid {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 0;
-  margin: 0;
-  padding: 16px 20px;
-  background: #f8fafc;
-  border-radius: 8px;
-  font-size: 14px;
-  color: #475569;
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 
-.overview-item {
-  display: inline;
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out;
 }
 
-.overview-item:not(:last-child)::after {
-  content: ' · ';
-  color: #cbd5e1;
-  margin: 0 4px;
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out;
 }
 
-.overview-context {
-  background: #fffbeb;
-  border-radius: 8px;
-  padding: 12px 20px;
-  margin: 12px 0 0 0;
-  font-size: 14px;
-  color: #78350f;
+.animate-slide-in-right {
+  animation: slide-in-right 0.5s ease-out;
 }
 
-.overview-context strong {
-  font-weight: 600;
-  color: #92400e;
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
 }
+
+/* Stagger animation delays */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+.stagger-5 { animation-delay: 0.5s; }
 
 /* ═══════════════════════════════════════════════════════════
-   Curated Content Cards - Tips från Friluftsfrämjandet
+   Component Styles
    ═══════════════════════════════════════════════════════════ */
 
-.curated-card {
-  background: #f8faf9;
-  border: none;
-  border-radius: 16px;
-  margin: 32px 0;
-  overflow: hidden;
+/* Focus styles */
+.focus-ring {
+  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-hgf-blue focus-visible:ring-offset-2;
 }
 
-/* Without image: just padding */
-.curated-card:not(.curated-with-image) {
-  padding: 24px;
+/* Hero section */
+.hero {
+  @apply relative min-h-[60vh] md:min-h-[70vh] flex items-center justify-center;
+  background: var(--color-hgf-red);
 }
 
-/* Two-column layout with image: 50/50 split */
-.curated-card.curated-with-image {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
-  align-items: stretch;
+.hero-content {
+  @apply text-center text-white px-6 py-16 md:px-12 md:py-24;
 }
 
-.curated-card.curated-with-image.curated-image-left {
-  grid-template-columns: 1fr 1fr;
+/* Card hover effect */
+.card-hover {
+  @apply transition-all duration-200 hover:shadow-md hover:-translate-y-1;
 }
 
-/* Text content */
-.curated-text {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 24px;
-  justify-content: center;
+/* Badge styles */
+.badge {
+  @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
 }
 
-.curated-badge {
-  display: inline-block;
-  width: fit-content;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #1e5a42;
-  background: #d4e5de;
-  padding: 4px 10px;
-  border-radius: 9999px;
-  margin: 0 0 12px 0 !important;
+.badge-red {
+  @apply bg-hgf-red/10 text-hgf-red;
 }
 
-.curated-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: #1e3a5f;
-  margin: 0 0 8px 0 !important;
-  line-height: 1.3;
-  font-family: 'Jakarta Sans', sans-serif;
+.badge-blue {
+  @apply bg-hgf-bg-light-blue text-hgf-blue;
 }
 
-.curated-body {
-  font-size: 14px;
-  color: #4a5568;
-  line-height: 1.6;
-  margin: 0 0 16px 0 !important;
+.badge-neutral {
+  @apply bg-hgf-neutral text-hgf-black/70;
 }
 
-.curated-button {
-  display: inline-flex;
-  align-items: center;
-  width: fit-content;
-  font-size: 14px;
-  font-weight: 500;
-  font-family: 'Inter Variable', sans-serif;
-  color: white;
-  background: #1e3a8a;
-  padding: 10px 20px;
-  border-radius: 9999px;
-  text-decoration: none;
-  transition: all 0.2s ease;
+/* ═══════════════════════════════════════════════════════════
+   Form Styles
+   ═══════════════════════════════════════════════════════════ */
+
+.form-group {
+  @apply space-y-2;
 }
 
-.curated-button:hover {
-  background: #2c4fa0;
-  text-decoration: none;
-  color: white;
+.form-label {
+  @apply block text-sm font-medium text-hgf-black;
 }
 
-/* Image container - 1:1 ratio, no rounded corners */
-.curated-image {
-  position: relative;
-  overflow: hidden;
-  background: #e5e7eb;
+.form-hint {
+  @apply text-sm text-hgf-black/60;
 }
 
-.curated-image::before {
-  content: '';
-  display: block;
-  padding-top: 100%; /* 1:1 aspect ratio */
+.form-error {
+  @apply text-sm text-red-600;
 }
 
-.curated-image img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+/* ═══════════════════════════════════════════════════════════
+   Navigation Styles
+   ═══════════════════════════════════════════════════════════ */
+
+.nav-link {
+  @apply text-hgf-black/70 hover:text-hgf-blue transition-colors font-medium;
 }
 
-/* Responsive: Stack on mobile */
-@media (max-width: 640px) {
-  .curated-card.curated-with-image {
-    grid-template-columns: 1fr;
-  }
-
-  .curated-card.curated-with-image.curated-image-left {
-    grid-template-columns: 1fr;
-  }
-
-  .curated-image {
-    order: -1;
-  }
-
-  .curated-image::before {
-    padding-top: 56.25%; /* 16:9 on mobile */
-  }
+.nav-link-active {
+  @apply text-hgf-blue;
 }
 
-/* Technical summary at bottom of document */
-.tech-summary {
-  margin-top: 2rem;
-  padding: 1rem 1.25rem;
-  background: #f8f8f8;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  color: #666;
-  line-height: 1.6;
+/* ═══════════════════════════════════════════════════════════
+   Style Guide Specific
+   ═══════════════════════════════════════════════════════════ */
+
+.color-swatch {
+  @apply w-full h-24 rounded-lg shadow-sm flex items-end p-3;
+}
+
+.component-demo {
+  @apply p-6 bg-white rounded-xl border border-hgf-neutral;
+}
+
+.code-block {
+  @apply bg-hgf-black text-white p-4 rounded-lg font-mono text-sm overflow-x-auto;
 }
