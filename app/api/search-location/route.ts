@@ -70,20 +70,44 @@ export async function GET(request: NextRequest) {
     // Sök efter ort/kommun
     const lowerQuery = query.toLowerCase();
 
-    // Sök i orter
+    // 1. Hitta kommuner som matchar (prioriteras först)
+    const matchingKommuner = new Map<string, OrtEntry>();
+    for (const entry of data.orter) {
+      if (entry.kommun.toLowerCase().startsWith(lowerQuery)) {
+        // Spara bara en entry per kommun (den där ort === kommun om möjligt)
+        const existing = matchingKommuner.get(entry.kommunKod);
+        if (!existing || entry.ort === entry.kommun) {
+          matchingKommuner.set(entry.kommunKod, entry);
+        }
+      }
+    }
+
+    // Lägg till kommuner först (max 4)
+    const kommunResults = Array.from(matchingKommuner.values()).slice(0, 4);
+    for (const entry of kommunResults) {
+      results.push({
+        type: "ort",
+        display: entry.kommun,
+        ort: entry.kommun, // Använd kommunnamnet
+        kommun: entry.kommun,
+        kommunKod: entry.kommunKod,
+        lan: entry.lan,
+        postnummer: entry.examplePostnummer,
+      });
+    }
+
+    // 2. Hitta orter som matchar på ortnamn (inte kommun)
     const matchingOrter = data.orter
       .filter((entry) =>
-        entry.ort.toLowerCase().startsWith(lowerQuery) ||
-        entry.kommun.toLowerCase().startsWith(lowerQuery)
+        entry.ort.toLowerCase().startsWith(lowerQuery) &&
+        entry.ort !== entry.kommun // Exkludera de som redan visas som kommun
       )
-      .slice(0, limit);
+      .slice(0, limit - results.length);
 
     for (const entry of matchingOrter) {
       results.push({
         type: "ort",
-        display: entry.ort === entry.kommun
-          ? entry.kommun
-          : `${entry.ort}, ${entry.kommun}`,
+        display: `${entry.ort}, ${entry.kommun}`,
         ort: entry.ort,
         kommun: entry.kommun,
         kommunKod: entry.kommunKod,

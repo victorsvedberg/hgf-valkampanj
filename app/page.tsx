@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowRight, Check } from "lucide-react";
+import { SignatureCounter } from "@/components/ui/signature-counter";
 
 const engagementOptions = [
   {
@@ -86,24 +87,14 @@ export default function HomePage() {
               <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
                 {/* Left: Message */}
                 <div className="text-white">
-                  <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+                  <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
                     Stoppa<br />marknadshyror
                   </h1>
-                  <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-lg">
+                  <SignatureCounter goal={10000} className="max-w-md mb-8" />
+                  <p className="text-xl md:text-2xl text-white/90 max-w-lg">
                     Skriv under uppropet och var med i kampen för rimliga hyror.
                     Tillsammans gör vi skillnad.
                   </p>
-                  <div className="flex items-center gap-8 text-white/80">
-                    <div>
-                      <p className="text-3xl md:text-4xl font-bold text-white">12 847</p>
-                      <p className="text-sm">har skrivit under</p>
-                    </div>
-                    <div className="w-px h-12 bg-white/30" />
-                    <div>
-                      <p className="text-3xl md:text-4xl font-bold text-white">Val 2026</p>
-                      <p className="text-sm">gör din röst hörd</p>
-                    </div>
-                  </div>
                 </div>
 
                 {/* Right: Form */}
@@ -229,6 +220,93 @@ export default function HomePage() {
                 </span>
               </Link>
             ))}
+          </div>
+        </section>
+
+        {/* Våra krav */}
+        <section className="bg-hgf-navy text-white py-20 md:py-28">
+          <div className="container-page">
+            <div className="text-center mb-12 md:mb-16">
+              <span className="inline-block bg-hgf-red text-white text-sm font-bold uppercase tracking-wider px-4 py-2 rounded-full mb-6">
+                Våra krav
+              </span>
+              <h2 className="text-white text-3xl md:text-4xl lg:text-5xl font-bold max-w-3xl mx-auto">
+                En bostadspolitik för alla – inte bara för dem med störst plånbok
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8 md:gap-12">
+              {/* Krav 1 */}
+              <div className="relative">
+                <span className="text-8xl md:text-9xl font-bold text-white/10 absolute -top-8 -left-2">
+                  1
+                </span>
+                <div className="relative pt-8">
+                  <h3 className="text-xl md:text-2xl font-bold text-white mb-4">
+                    Fler bostäder med rimliga hyror
+                  </h3>
+                  <p className="text-white/80 leading-relaxed">
+                    För att möta bostadsbristen behövs fler hyresrätter till rimliga hyror. Staten bör stötta byggandet med förmånliga bygglån så att nyproduktionen ökar i den takt som krävs samtidigt som hyrorna hålls nere.
+                  </p>
+                </div>
+              </div>
+
+              {/* Krav 2 */}
+              <div className="relative">
+                <span className="text-8xl md:text-9xl font-bold text-white/10 absolute -top-8 -left-2">
+                  2
+                </span>
+                <div className="relative pt-8">
+                  <h3 className="text-xl md:text-2xl font-bold text-white mb-4">
+                    Nej till marknadshyror
+                  </h3>
+                  <p className="text-white/80 leading-relaxed">
+                    Marknadshyror leder till stora hyreshöjningar som skulle tvinga många att flytta och öka hemlösheten. För att bostadsmarknaden och arbetsmarknaden ska fungera behöver vi fler hyresrätter med rimliga hyror. Ett tryggt boende hela livet.
+                  </p>
+                </div>
+              </div>
+
+              {/* Krav 3 */}
+              <div className="relative">
+                <span className="text-8xl md:text-9xl font-bold text-white/10 absolute -top-8 -left-2">
+                  3
+                </span>
+                <div className="relative pt-8">
+                  <h3 className="text-xl md:text-2xl font-bold text-white mb-4">
+                    Bostadskö efter behov, inte bara kötid
+                  </h3>
+                  <p className="text-white/80 leading-relaxed">
+                    I dag styr kötid nästan helt vem som får en bostad, vilket missgynnar unga. Reglerna måste ändras så att fler lägenheter kan fördelas efter behov, till exempel till dem som står utan boende.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="bg-hgf-bg-light-blue py-20 md:py-28">
+          <div className="container-narrow text-center">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-hgf-black mb-6">
+              Valet 2026 avgör bostadspolitiken
+            </h2>
+            <p className="text-lg md:text-xl text-hgf-black/70 max-w-2xl mx-auto mb-10">
+              Tillsammans kan vi stoppa marknadshyror och säkra rätten till ett tryggt boende.
+              Varje underskrift räknas. Varje röst gör skillnad.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button variant="red" size="lg" asChild>
+                <Link href="/skriv-under">
+                  Skriv under nu
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button variant="outline" size="lg" asChild>
+                <Link href="/bli-aktiv">
+                  Bli aktiv i kampanjen
+                </Link>
+              </Button>
+            </div>
           </div>
         </section>
       </main>

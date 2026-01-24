@@ -76,6 +76,7 @@ interface SelectedLocation {
   kommun: string;
   kommunKod: string;
   lan: string;
+  postnummer?: string;
 }
 
 export default function KontaktaPolitikerPage() {
@@ -87,7 +88,8 @@ export default function KontaktaPolitikerPage() {
   const [matchedPoliticians, setMatchedPoliticians] = useState<Politician[]>([]);
   const [sentEmails, setSentEmails] = useState<string[]>([]);
   const [sendingTo, setSendingTo] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const handleMessageNext = (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,22 +101,18 @@ export default function KontaktaPolitikerPage() {
     kommun: string;
     kommunKod: string;
     lan: string;
+    postnummer?: string;
   }) => {
     setSelectedLocation(result);
-    setError(null);
+    setLocationError(null);
   };
 
   const handleFindPoliticians = (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setLocationError(null);
 
     if (!selectedLocation) {
-      setError("Välj en ort eller skriv in ett postnummer");
-      return;
-    }
-
-    if (!userName.trim() || !userEmail.trim()) {
-      setError("Fyll i ditt namn och e-postadress");
+      setLocationError("Välj en ort från listan");
       return;
     }
 
@@ -122,7 +120,7 @@ export default function KontaktaPolitikerPage() {
     const politicians = politiciansByKommun[selectedLocation.kommunKod] || [];
 
     if (politicians.length === 0) {
-      setError(`Vi har tyvärr inga politiker registrerade för ${selectedLocation.kommun} än. Testa Stockholm, Huddinge eller Gotland för demo.`);
+      setLocationError(`Det finns inga politiker att kontakta i ${selectedLocation.kommun} just nu.`);
       return;
     }
 
@@ -131,7 +129,7 @@ export default function KontaktaPolitikerPage() {
   };
 
   const handleSendEmail = async (politician: Politician) => {
-    setError(null);
+    setApiError(null);
     setSendingTo(politician.email);
 
     try {
@@ -146,6 +144,8 @@ export default function KontaktaPolitikerPage() {
           politicianEmail: politician.email,
           politicianName: politician.name,
           message: message,
+          postnummer: selectedLocation?.postnummer,
+          kommun: selectedLocation?.kommun,
         }),
       });
 
@@ -156,7 +156,7 @@ export default function KontaktaPolitikerPage() {
 
       setSentEmails([...sentEmails, politician.email]);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Kunde inte skicka mejlet. Försök igen.");
+      setApiError(err instanceof Error ? err.message : "Kunde inte skicka mejlet. Försök igen.");
     } finally {
       setSendingTo(null);
     }
@@ -213,11 +213,11 @@ export default function KontaktaPolitikerPage() {
         {/* Content */}
         <section className="section bg-hgf-bg-light-blue">
           <div className="container-narrow">
-            {/* Error message */}
-            {error && (
+            {/* API Error message (visas bara vid mejlfel) */}
+            {apiError && (
               <div className="max-w-2xl mx-auto mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
                 <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
-                <p className="text-red-700 text-sm">{error}</p>
+                <p className="text-red-700 text-sm">{apiError}</p>
               </div>
             )}
 
@@ -283,8 +283,10 @@ export default function KontaktaPolitikerPage() {
                       <LocationAutocomplete
                         label="Var bor du?"
                         placeholder="Sök ort eller postnummer..."
-                        hint="T.ex. 'Stockholm' eller '114 40'"
+                        hint={!locationError ? "T.ex. 'Stockholm' eller '114 40'" : undefined}
+                        error={locationError || undefined}
                         onSelect={handleLocationSelect}
+                        onClear={() => setSelectedLocation(null)}
                       />
                       {selectedLocation && (
                         <div className="p-3 bg-hgf-bg-light-blue rounded-lg flex items-center gap-2">
@@ -380,7 +382,7 @@ export default function KontaktaPolitikerPage() {
                   <Button variant="outline" onClick={() => setStep("message")}>
                     Ändra meddelande
                   </Button>
-                  <Button variant="outline" onClick={() => { setStep("details"); setError(null); }}>
+                  <Button variant="outline" onClick={() => { setStep("details"); setLocationError(null); }}>
                     Ändra uppgifter
                   </Button>
                 </div>

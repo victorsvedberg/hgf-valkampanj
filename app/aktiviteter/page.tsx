@@ -1,15 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Calendar, MapPin, Users, Clock, ArrowRight, Check } from "lucide-react";
+import { LocationAutocomplete } from "@/components/ui/location-autocomplete";
+import { Calendar, MapPin, Clock, ArrowRight, Check, X } from "lucide-react";
+
+interface Event {
+  id: string;
+  title: string;
+  date: string;
+  time: string;
+  location: string;
+  description: string;
+  postnummer: string;
+  kommun: string;
+  kommunKod: string;
+  isOnline?: boolean;
+}
 
 // Dummy-data för aktiviteter
-const dummyEvents = [
+const dummyEvents: Event[] = [
   {
     id: "1",
     title: "Dörrknackning Södermalm",
@@ -17,18 +31,21 @@ const dummyEvents = [
     time: "10:00 - 14:00",
     location: "Medborgarplatsen, Stockholm",
     description: "Kampanjdag 8 mars - hjälp till att sprida budskapet genom dörrknackning.",
-    spots: 15,
-    spotsLeft: 8,
+    postnummer: "11820",
+    kommun: "Stockholm",
+    kommunKod: "0180",
   },
   {
     id: "2",
     title: "Informationsmöte Online",
     date: "2026-03-15",
     time: "18:00 - 19:30",
-    location: "Zoom",
+    location: "Zoom (länk skickas efter anmälan)",
     description: "Lär dig mer om marknadshyror och hur du kan engagera dig i kampanjen.",
-    spots: 50,
-    spotsLeft: 32,
+    postnummer: "",
+    kommun: "",
+    kommunKod: "",
+    isOnline: true,
   },
   {
     id: "3",
@@ -37,8 +54,31 @@ const dummyEvents = [
     time: "11:00 - 15:00",
     location: "Brunnsparken, Göteborg",
     description: "Dela ut flygblad och prata med förbipasserande om vikten av att stoppa marknadshyror.",
-    spots: 20,
-    spotsLeft: 12,
+    postnummer: "41103",
+    kommun: "Göteborg",
+    kommunKod: "1480",
+  },
+  {
+    id: "4",
+    title: "Kampanjmöte Malmö",
+    date: "2026-04-22",
+    time: "18:00 - 20:00",
+    location: "ABF Malmö, Spånehusvägen 47",
+    description: "Planera vårens kampanjaktiviteter i Malmö-regionen.",
+    postnummer: "21432",
+    kommun: "Malmö",
+    kommunKod: "1280",
+  },
+  {
+    id: "5",
+    title: "Torgmöte Huddinge Centrum",
+    date: "2026-05-01",
+    time: "11:00 - 14:00",
+    location: "Huddinge Centrum",
+    description: "Första maj-aktivitet med fokus på bostadspolitik.",
+    postnummer: "14130",
+    kommun: "Huddinge",
+    kommunKod: "0126",
   },
 ];
 
@@ -52,8 +92,16 @@ function formatDate(dateStr: string) {
   });
 }
 
+interface SelectedLocation {
+  ort: string;
+  kommun: string;
+  kommunKod: string;
+  lan: string;
+}
+
 export default function AktiviteterPage() {
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<SelectedLocation | null>(null);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -62,6 +110,22 @@ export default function AktiviteterPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [registeredEvents, setRegisteredEvents] = useState<string[]>([]);
+
+  // Filtrera och sortera events baserat på vald plats
+  const filteredEvents = useMemo(() => {
+    if (!selectedLocation) return dummyEvents;
+
+    const matching = dummyEvents.filter(event =>
+      event.isOnline || event.kommunKod === selectedLocation.kommunKod
+    );
+
+    // Sortera så lokala events kommer före online
+    return matching.sort((a, b) => {
+      if (a.isOnline && !b.isOnline) return 1;
+      if (!a.isOnline && b.isOnline) return -1;
+      return 0;
+    });
+  }, [selectedLocation]);
 
   const handleRegister = async (eventId: string) => {
     setIsSubmitting(true);
@@ -86,10 +150,33 @@ export default function AktiviteterPage() {
           <div className="container-narrow">
             <span className="badge bg-white/20 text-white mb-4">Aktiviteter</span>
             <h1 className="text-white mb-4">Kommande aktiviteter</h1>
-            <p className="text-xl text-white/90 max-w-xl mx-auto">
+            <p className="text-xl text-white/90 max-w-xl mx-auto mb-8">
               Delta i kampanjaktiviteter nära dig. Träffa andra engagerade
               och gör skillnad tillsammans.
             </p>
+
+            {/* Sök på plats */}
+            <div className="max-w-md mx-auto">
+              <div className="bg-white rounded-xl p-4">
+                <LocationAutocomplete
+                  placeholder="Sök ort eller postnummer..."
+                  onSelect={(result) => setSelectedLocation(result)}
+                  onClear={() => setSelectedLocation(null)}
+                />
+              </div>
+              {selectedLocation && (
+                <div className="mt-3 inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-2 text-sm">
+                  <MapPin className="h-4 w-4" />
+                  Visar aktiviteter i {selectedLocation.kommun}
+                  <button
+                    onClick={() => setSelectedLocation(null)}
+                    className="ml-1 hover:bg-white/20 rounded-full p-0.5"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </section>
 
@@ -97,7 +184,7 @@ export default function AktiviteterPage() {
         <section className="section bg-hgf-bg-light-blue">
           <div className="container-page">
             <div className="grid gap-6 max-w-3xl mx-auto">
-              {dummyEvents.map((event) => {
+              {filteredEvents.map((event) => {
                 const isRegistered = registeredEvents.includes(event.id);
 
                 return (
@@ -133,10 +220,6 @@ export default function AktiviteterPage() {
                             <span className="inline-flex items-center gap-1.5">
                               <MapPin className="h-4 w-4 text-hgf-blue" />
                               {event.location}
-                            </span>
-                            <span className="inline-flex items-center gap-1.5">
-                              <Users className="h-4 w-4 text-hgf-blue" />
-                              {event.spotsLeft} platser kvar
                             </span>
                           </div>
 
@@ -223,17 +306,29 @@ export default function AktiviteterPage() {
             </div>
 
             {/* Inga aktiviteter-meddelande */}
-            {dummyEvents.length === 0 && (
+            {filteredEvents.length === 0 && (
               <Card className="max-w-lg mx-auto text-center p-8">
-                <Calendar className="h-12 w-12 text-hgf-neutral-dark mx-auto mb-4" />
-                <CardTitle className="mb-2">Inga aktiviteter just nu</CardTitle>
+                <Calendar className="h-12 w-12 text-hgf-black/20 mx-auto mb-4" />
+                <CardTitle className="mb-2">
+                  {selectedLocation
+                    ? `Inga aktiviteter i ${selectedLocation.kommun}`
+                    : "Inga aktiviteter just nu"}
+                </CardTitle>
                 <CardDescription>
-                  Det finns inga planerade aktiviteter i din region just nu.
-                  Registrera dig som aktiv medlem för att få besked när nya aktiviteter planeras.
+                  {selectedLocation
+                    ? "Det finns inga planerade aktiviteter i detta område just nu. Prova att söka på en annan ort eller registrera dig som aktiv medlem."
+                    : "Det finns inga planerade aktiviteter just nu. Registrera dig som aktiv medlem för att få besked när nya aktiviteter planeras."}
                 </CardDescription>
-                <Button className="mt-4" variant="red" asChild>
-                  <a href="/bli-aktiv">Bli aktiv medlem</a>
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center mt-6">
+                  {selectedLocation && (
+                    <Button variant="outline" onClick={() => setSelectedLocation(null)}>
+                      Visa alla aktiviteter
+                    </Button>
+                  )}
+                  <Button variant="red" asChild>
+                    <a href="/bli-aktiv">Bli aktiv medlem</a>
+                  </Button>
+                </div>
               </Card>
             )}
           </div>

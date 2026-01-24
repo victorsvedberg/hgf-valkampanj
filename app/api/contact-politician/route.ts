@@ -7,13 +7,15 @@ interface ContactPoliticianRequest {
   politicianEmail: string;
   politicianName: string;
   message: string;
+  postnummer?: string;
+  kommun?: string;
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body: ContactPoliticianRequest = await request.json();
 
-    const { userName, userEmail, politicianEmail, politicianName, message } = body;
+    const { userName, userEmail, politicianEmail, politicianName, message, postnummer, kommun } = body;
 
     // Validate required fields
     if (!userName || !userEmail || !politicianEmail || !message) {
@@ -53,6 +55,8 @@ export async function POST(request: NextRequest) {
       attributes: {
         HAS_CONTACTED_POLITICIAN: true,
         LAST_POLITICIAN_CONTACT: new Date().toISOString().split("T")[0],
+        ...(postnummer && { POSTNUMMER: postnummer }),
+        ...(kommun && { KOMMUN: kommun }),
       },
     });
 

@@ -16,27 +16,37 @@ interface LocationResult {
 
 interface LocationAutocompleteProps {
   onSelect: (result: LocationResult) => void;
+  onClear?: () => void;
   placeholder?: string;
   label?: string;
   hint?: string;
+  error?: string;
 }
 
 export function LocationAutocomplete({
   onSelect,
+  onClear,
   placeholder = "Sök ort eller postnummer...",
   label,
   hint,
+  error,
 }: LocationAutocompleteProps) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<LocationResult[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [hasSelection, setHasSelection] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Debounced search
   useEffect(() => {
+    // Sök inte om vi redan har gjort ett val
+    if (hasSelection) {
+      return;
+    }
+
     if (query.length < 2) {
       setResults([]);
       setIsOpen(false);
@@ -62,7 +72,7 @@ export function LocationAutocomplete({
     }, 200);
 
     return () => clearTimeout(timeoutId);
-  }, [query]);
+  }, [query, hasSelection]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -79,7 +89,19 @@ export function LocationAutocomplete({
   const handleSelect = (result: LocationResult) => {
     setQuery(result.display);
     setIsOpen(false);
+    setHasSelection(true);
     onSelect(result);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setQuery(newValue);
+
+    // Om användaren ändrar texten efter ett val, rensa valet så sökning kan ske igen
+    if (hasSelection) {
+      setHasSelection(false);
+      onClear?.();
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -115,9 +137,10 @@ export function LocationAutocomplete({
           ref={inputRef}
           label={label}
           hint={hint}
+          error={error}
           placeholder={placeholder}
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           onFocus={() => results.length > 0 && setIsOpen(true)}
           autoComplete="off"

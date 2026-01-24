@@ -11,15 +11,11 @@ export function Footer() {
             {/* Brand */}
             <div>
               <Image
-                src="/assets/hgf-large-h-symbol.svg"
+                src="/assets/hgf-large-h-symbol-negative.svg"
                 alt=""
-                width={48}
-                height={48}
-                className="mb-4 brightness-0 invert"
+                width={120}
+                height={120}
               />
-              <p className="text-white/80 text-sm">
-                Tillsammans kämpar vi för en rättvis bostadspolitik.
-              </p>
             </div>
 
             {/* Engagera dig */}
