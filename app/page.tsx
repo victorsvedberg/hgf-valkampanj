@@ -54,25 +54,84 @@ const engagementOptions = [
 ];
 
 export default function HomePage() {
+  const [step, setStep] = useState<"form" | "extra" | "done">("form");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
     acceptTerms: false,
   });
+  const [extraData, setExtraData] = useState({
+    phone: "",
+    postnummer: "",
+  });
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
 
-    // TODO: Implementera Brevo-integration
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const response = await fetch("/api/petition/sign", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName: formData.firstName.trim(),
+          lastName: formData.lastName.trim(),
+          email: formData.email.trim(),
+        }),
+      });
 
-    console.log("Form data:", formData);
-    setIsSubmitting(false);
-    setIsSubmitted(true);
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Något gick fel");
+      }
+
+      setStep("extra");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Kunde inte skicka. Försök igen.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleExtraSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/petition/update-contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email.trim(),
+          phone: extraData.phone.trim() || undefined,
+          postnummer: extraData.postnummer.trim() || undefined,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Något gick fel");
+      }
+
+      setStep("done");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Kunde inte skicka. Försök igen.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const skipExtra = () => {
+    setStep("done");
   };
 
   return (
@@ -99,13 +158,13 @@ export default function HomePage() {
 
                 {/* Right: Form */}
                 <div>
-                  {isSubmitted ? (
+                  {step === "done" ? (
                     <div className="bg-white rounded-2xl p-8 md:p-10 text-center">
                       <div className="w-16 h-16 bg-hgf-blue rounded-full flex items-center justify-center mx-auto mb-6">
                         <Check className="h-8 w-8 text-white" />
                       </div>
                       <h2 className="text-2xl font-bold text-hgf-black mb-3">
-                        Tack för din underskrift!
+                        Tack {formData.firstName}!
                       </h2>
                       <p className="text-hgf-black/70 mb-6">
                         Du är nu en del av rörelsen. Vi hör av oss med mer information.
@@ -116,6 +175,59 @@ export default function HomePage() {
                           <ArrowRight className="ml-2 h-4 w-4" />
                         </Link>
                       </Button>
+                    </div>
+                  ) : step === "extra" ? (
+                    <div className="bg-white rounded-2xl p-8 md:p-10">
+                      <div className="w-12 h-12 bg-hgf-blue rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Check className="h-6 w-6 text-white" />
+                      </div>
+                      <h2 className="text-2xl font-bold text-hgf-black mb-2 text-center">
+                        Tack för din underskrift!
+                      </h2>
+                      <p className="text-hgf-black/70 mb-6 text-center">
+                        Vill du hjälpa oss ännu mer? Med ditt postnummer och mobilnummer
+                        kan vi skicka relevanta uppdateringar och meddela dig när
+                        blixtaktioner sker i din närhet.
+                      </p>
+
+                      <form onSubmit={handleExtraSubmit} className="space-y-4">
+                        <Input
+                          type="tel"
+                          placeholder="Mobilnummer (t.ex. 070-123 45 67)"
+                          value={extraData.phone}
+                          onChange={(e) =>
+                            setExtraData({ ...extraData, phone: e.target.value })
+                          }
+                        />
+                        <Input
+                          placeholder="Postnummer (t.ex. 114 40)"
+                          value={extraData.postnummer}
+                          onChange={(e) =>
+                            setExtraData({ ...extraData, postnummer: e.target.value })
+                          }
+                        />
+
+                        {error && (
+                          <p className="text-red-600 text-sm">{error}</p>
+                        )}
+
+                        <Button
+                          type="submit"
+                          variant="red"
+                          className="w-full"
+                          size="lg"
+                          loading={isSubmitting}
+                        >
+                          Spara uppgifter
+                        </Button>
+                        <button
+                          type="button"
+                          onClick={skipExtra}
+                          className="w-full text-sm text-hgf-black/50 hover:text-hgf-black transition-colors"
+                        >
+                          Hoppa över
+                        </button>
+                      </form>
                     </div>
                   ) : (
                     <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-8 md:p-10">
@@ -165,6 +277,10 @@ export default function HomePage() {
                           required
                         />
                       </div>
+
+                      {error && (
+                        <p className="text-red-600 text-sm mt-4">{error}</p>
+                      )}
 
                       <Button
                         type="submit"
