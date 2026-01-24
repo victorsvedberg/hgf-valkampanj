@@ -7,30 +7,38 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { User, MapPin, ArrowRight, Check, Send } from "lucide-react";
+import { User, MapPin, ArrowRight, Check, Send, AlertCircle } from "lucide-react";
 
-// Dummy-data för politiker (ersätts med lookup-tabell)
-const dummyPoliticians = [
+// Politiker-data med postnummerområden
+const politicians = [
+  // Stockholm (postnummer 100 00 - 199 99)
   {
-    name: "Anna Politiker",
-    party: "Socialdemokraterna",
-    role: "Riksdagsledamot",
-    email: "anna.politiker@riksdagen.se",
-    region: "Stockholm",
-  },
-  {
-    name: "Erik Folkpartist",
-    party: "Liberalerna",
+    name: "Victor Svedberg",
+    party: "Testpartiet",
     role: "Kommunalråd",
-    email: "erik.folkpartist@kommun.se",
+    email: "victor.svedberg@reformsociety.se",
     region: "Stockholm",
+    postalCodeMin: 10000,
+    postalCodeMax: 19999,
   },
   {
-    name: "Maria Moderat",
-    party: "Moderaterna",
+    name: "Jakob Ohlsson",
+    party: "Liberaldemokraterna",
     role: "Riksdagsledamot",
-    email: "maria.moderat@riksdagen.se",
+    email: "jakob.ohlsson@reformsociety.se",
     region: "Stockholm",
+    postalCodeMin: 10000,
+    postalCodeMax: 19999,
+  },
+  // Gotland (postnummer 621 00 - 624 99)
+  {
+    name: "Njord Frolander",
+    party: "Socialmoderaterna",
+    role: "Riksdagsledamot",
+    email: "njord.frolander@reformsociety.se",
+    region: "Gotland",
+    postalCodeMin: 62100,
+    postalCodeMax: 62499,
   },
 ];
 
@@ -46,11 +54,18 @@ Tack för ditt svar.
 
 Med vänlig hälsning`;
 
+type Politician = typeof politicians[0];
+
 export default function KontaktaPolitikerPage() {
   const [step, setStep] = useState<"message" | "postalCode" | "politicians">("message");
   const [message, setMessage] = useState(defaultMessage);
   const [postalCode, setPostalCode] = useState("");
+  const [userName, setUserName] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+  const [matchedPoliticians, setMatchedPoliticians] = useState<Politician[]>([]);
   const [sentEmails, setSentEmails] = useState<string[]>([]);
+  const [sendingTo, setSendingTo] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleMessageNext = (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,21 +74,66 @@ export default function KontaktaPolitikerPage() {
 
   const handlePostalCodeSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implementera postnummer → politiker lookup
+    setError(null);
+
+    // Rensa postnummer (ta bort mellanslag)
+    const cleanPostalCode = postalCode.replace(/\s/g, "");
+    const postalCodeNum = parseInt(cleanPostalCode, 10);
+
+    if (isNaN(postalCodeNum) || cleanPostalCode.length !== 5) {
+      setError("Ange ett giltigt postnummer (5 siffror)");
+      return;
+    }
+
+    // Hitta politiker för postnumret
+    const matched = politicians.filter(
+      (p) => postalCodeNum >= p.postalCodeMin && postalCodeNum <= p.postalCodeMax
+    );
+
+    if (matched.length === 0) {
+      setError("Vi hittade inga politiker för detta postnummer. Testa ett Stockholms-postnummer (100 00 - 199 99) eller Gotlands-postnummer (621 00 - 624 99) för demo.");
+      return;
+    }
+
+    setMatchedPoliticians(matched);
     setStep("politicians");
   };
 
-  const handleSendEmail = (politician: typeof dummyPoliticians[0]) => {
-    // Markera som skickat (för demo - i produktion öppnas mailto:)
-    setSentEmails([...sentEmails, politician.email]);
+  const handleSendEmail = async (politician: Politician) => {
+    if (!userName.trim() || !userEmail.trim()) {
+      setError("Fyll i ditt namn och e-postadress");
+      return;
+    }
 
-    // TODO: I produktion, öppna mailto:
-    // const subject = encodeURIComponent("Fråga om marknadshyror");
-    // const body = encodeURIComponent(message);
-    // window.location.href = `mailto:${politician.email}?subject=${subject}&body=${body}`;
+    setError(null);
+    setSendingTo(politician.email);
 
-    // TODO: Logga i Brevo att användaren kontaktat politiker
-    console.log("Kontaktade politiker:", politician.email);
+    try {
+      const response = await fetch("/api/contact-politician", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userName: userName.trim(),
+          userEmail: userEmail.trim(),
+          politicianEmail: politician.email,
+          politicianName: politician.name,
+          message: message,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Något gick fel");
+      }
+
+      setSentEmails([...sentEmails, politician.email]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Kunde inte skicka mejlet. Försök igen.");
+    } finally {
+      setSendingTo(null);
+    }
   };
 
   return (
@@ -110,7 +170,7 @@ export default function KontaktaPolitikerPage() {
                 <span className={`w-7 h-7 rounded-full flex items-center justify-center text-sm ${step === "message" ? "bg-hgf-neutral text-hgf-black/50" : "bg-hgf-blue text-white"}`}>
                   {step === "politicians" ? <Check className="h-4 w-4" /> : "2"}
                 </span>
-                <span className="hidden sm:inline">Ange postnummer</span>
+                <span className="hidden sm:inline">Dina uppgifter</span>
               </div>
               <div className="w-8 h-px bg-hgf-neutral" />
               {/* Steg 3 */}
@@ -127,6 +187,14 @@ export default function KontaktaPolitikerPage() {
         {/* Content */}
         <section className="section bg-hgf-bg-light-blue">
           <div className="container-narrow">
+            {/* Error message */}
+            {error && (
+              <div className="max-w-2xl mx-auto mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
+                <p className="text-red-700 text-sm">{error}</p>
+              </div>
+            )}
+
             {/* Steg 1: Skriv meddelande */}
             {step === "message" && (
               <div className="animate-fade-in">
@@ -148,7 +216,7 @@ export default function KontaktaPolitikerPage() {
                       />
                       <div className="flex justify-end">
                         <Button type="submit" variant="red">
-                          Nästa: Ange postnummer
+                          Nästa: Dina uppgifter
                           <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
                       </div>
@@ -158,26 +226,43 @@ export default function KontaktaPolitikerPage() {
               </div>
             )}
 
-            {/* Steg 2: Ange postnummer */}
+            {/* Steg 2: Ange uppgifter */}
             {step === "postalCode" && (
               <div className="animate-fade-in">
                 <Card className="max-w-md mx-auto">
                   <CardHeader className="text-center">
-                    <CardTitle>Var bor du?</CardTitle>
+                    <CardTitle>Dina uppgifter</CardTitle>
                     <CardDescription>
-                      Ange ditt postnummer så hittar vi politikerna som representerar dig.
+                      Fyll i dina uppgifter så hittar vi politikerna som representerar dig.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <form onSubmit={handlePostalCodeSearch} className="space-y-6">
+                    <form onSubmit={handlePostalCodeSearch} className="space-y-4">
                       <Input
+                        label="Ditt namn"
+                        placeholder="Anna Andersson"
+                        value={userName}
+                        onChange={(e) => setUserName(e.target.value)}
+                        required
+                      />
+                      <Input
+                        label="Din e-postadress"
+                        type="email"
+                        placeholder="anna@exempel.se"
+                        value={userEmail}
+                        onChange={(e) => setUserEmail(e.target.value)}
+                        hint="Politikern svarar direkt till din mejl"
+                        required
+                      />
+                      <Input
+                        label="Postnummer"
                         placeholder="123 45"
                         value={postalCode}
                         onChange={(e) => setPostalCode(e.target.value)}
-                        className="text-center text-2xl py-6"
+                        hint="För demo: Stockholms- eller Gotlands-postnummer"
                         required
                       />
-                      <div className="flex gap-3">
+                      <div className="flex gap-3 pt-2">
                         <Button
                           type="button"
                           variant="outline"
@@ -203,13 +288,15 @@ export default function KontaktaPolitikerPage() {
                 <div className="text-center">
                   <h2 className="mb-2">Politiker i ditt område</h2>
                   <p className="text-hgf-black/70">
-                    Klicka på en politiker för att skicka ditt meddelande via din e-postklient.
+                    Klicka för att skicka ditt meddelande. Det skickas från{" "}
+                    <strong>{userEmail}</strong>.
                   </p>
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-2 max-w-3xl mx-auto">
-                  {dummyPoliticians.map((politician, index) => {
+                  {matchedPoliticians.map((politician, index) => {
                     const isSent = sentEmails.includes(politician.email);
+                    const isSending = sendingTo === politician.email;
 
                     return (
                       <Card
@@ -245,6 +332,7 @@ export default function KontaktaPolitikerPage() {
                               onClick={() => handleSendEmail(politician)}
                               variant="red"
                               className="w-full"
+                              loading={isSending}
                             >
                               <Send className="h-4 w-4 mr-2" />
                               Skicka mejl
@@ -260,8 +348,8 @@ export default function KontaktaPolitikerPage() {
                   <Button variant="outline" onClick={() => setStep("message")}>
                     Ändra meddelande
                   </Button>
-                  <Button variant="outline" onClick={() => setStep("postalCode")}>
-                    Byt postnummer
+                  <Button variant="outline" onClick={() => { setStep("postalCode"); setError(null); }}>
+                    Ändra uppgifter
                   </Button>
                 </div>
               </div>
