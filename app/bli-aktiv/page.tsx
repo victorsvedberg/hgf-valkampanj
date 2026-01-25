@@ -74,9 +74,9 @@ export default function BliAktivPage() {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
-        <main className="flex-1 flex items-center justify-center">
+        <main className="flex-1 flex items-center justify-center bg-hgf-bg-light-blue">
           <div className="container-narrow py-16 text-center">
-            <div className="w-20 h-20 bg-hgf-green rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="w-20 h-20 bg-hgf-blue rounded-full flex items-center justify-center mx-auto mb-6">
               <Check className="h-10 w-10 text-white" />
             </div>
             <h1 className="text-3xl md:text-4xl mb-4">Välkommen som aktiv!</h1>
@@ -102,17 +102,20 @@ export default function BliAktivPage() {
       <Header />
 
       <main className="flex-1">
-        <section className="section">
-          <div className="container-page">
-            <div className="text-center mb-12">
-              <span className="badge badge-green mb-4">Engagera dig</span>
-              <h1 className="mb-4">Bli aktiv medlem</h1>
-              <p className="text-lg text-hgf-black/70 max-w-xl mx-auto">
-                Vill du göra mer för att stoppa marknadshyror? Anmäl dig som
-                aktiv medlem och bli en del av kampanjarbetet.
-              </p>
-            </div>
+        {/* Hero */}
+        <section className="bg-hgf-navy py-16 md:py-24 text-center text-white">
+          <div className="container-narrow">
+            <span className="badge bg-white/20 text-white mb-4">Engagera dig</span>
+            <h1 className="text-white mb-4">Bli aktiv medlem</h1>
+            <p className="text-xl text-white/90 max-w-xl mx-auto">
+              Vill du göra mer för att stoppa marknadshyror? Anmäl dig som
+              aktiv medlem och bli en del av kampanjarbetet.
+            </p>
+          </div>
+        </section>
 
+        <section className="section bg-hgf-bg-light-blue">
+          <div className="container-page">
             <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
               {/* Info-sektion */}
               <div className="lg:col-span-1 space-y-6">
@@ -139,25 +142,25 @@ export default function BliAktivPage() {
                   <CardContent>
                     <ol className="text-sm text-hgf-black/70 space-y-3">
                       <li className="flex gap-3">
-                        <span className="w-6 h-6 rounded-full bg-hgf-green/10 text-hgf-green flex items-center justify-center shrink-0 text-xs font-semibold">
+                        <span className="w-6 h-6 rounded-full bg-hgf-blue/10 text-hgf-blue flex items-center justify-center shrink-0 text-xs font-semibold">
                           1
                         </span>
                         <span>Du skickar in din anmälan</span>
                       </li>
                       <li className="flex gap-3">
-                        <span className="w-6 h-6 rounded-full bg-hgf-green/10 text-hgf-green flex items-center justify-center shrink-0 text-xs font-semibold">
+                        <span className="w-6 h-6 rounded-full bg-hgf-blue/10 text-hgf-blue flex items-center justify-center shrink-0 text-xs font-semibold">
                           2
                         </span>
                         <span>Vi ringer upp dig för ett kort samtal</span>
                       </li>
                       <li className="flex gap-3">
-                        <span className="w-6 h-6 rounded-full bg-hgf-green/10 text-hgf-green flex items-center justify-center shrink-0 text-xs font-semibold">
+                        <span className="w-6 h-6 rounded-full bg-hgf-blue/10 text-hgf-blue flex items-center justify-center shrink-0 text-xs font-semibold">
                           3
                         </span>
                         <span>Du kopplas ihop med din lokala region</span>
                       </li>
                       <li className="flex gap-3">
-                        <span className="w-6 h-6 rounded-full bg-hgf-green/10 text-hgf-green flex items-center justify-center shrink-0 text-xs font-semibold">
+                        <span className="w-6 h-6 rounded-full bg-hgf-blue/10 text-hgf-blue flex items-center justify-center shrink-0 text-xs font-semibold">
                           4
                         </span>
                         <span>Du börjar delta i aktiviteter!</span>
@@ -257,14 +260,14 @@ export default function BliAktivPage() {
                               onClick={() => toggleInterest(interest.id)}
                               className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-all text-left ${
                                 isSelected
-                                  ? "border-hgf-green bg-hgf-green/5"
-                                  : "border-hgf-neutral hover:border-hgf-green/50"
+                                  ? "border-hgf-blue bg-hgf-blue/5"
+                                  : "border-hgf-neutral hover:border-hgf-blue/50"
                               }`}
                             >
                               <div
                                 className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                                   isSelected
-                                    ? "bg-hgf-green text-white"
+                                    ? "bg-hgf-blue text-white"
                                     : "bg-hgf-neutral/50 text-hgf-black/50"
                                 }`}
                               >
@@ -272,7 +275,7 @@ export default function BliAktivPage() {
                               </div>
                               <span
                                 className={`font-medium ${
-                                  isSelected ? "text-hgf-green" : "text-hgf-black/70"
+                                  isSelected ? "text-hgf-blue" : "text-hgf-black/70"
                                 }`}
                               >
                                 {interest.label}
@@ -328,6 +331,7 @@ export default function BliAktivPage() {
 
                     <Button
                       type="submit"
+                      variant="red"
                       className="w-full"
                       size="lg"
                       loading={isSubmitting}

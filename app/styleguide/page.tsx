@@ -21,17 +21,19 @@ export default function StyleguidePage() {
       <Header />
 
       <main className="flex-1">
-        <section className="section-sm border-b border-hgf-neutral">
-          <div className="container-page">
-            <h1 className="brand mb-2">Style Guide</h1>
-            <p className="text-lg text-hgf-black/70">
-              Designsystem baserat på Hyresgästföreningens huvudsajt · Stoppa Marknadshyror
+        {/* Hero */}
+        <section className="bg-hgf-navy py-16 md:py-24 text-center text-white">
+          <div className="container-narrow">
+            <span className="badge bg-white/20 text-white mb-4">Dokumentation</span>
+            <h1 className="text-white mb-4">Style Guide</h1>
+            <p className="text-xl text-white/90 max-w-xl mx-auto">
+              Designsystem baserat på Hyresgästföreningens huvudsajt för kampanjen Stoppa Marknadshyror.
             </p>
           </div>
         </section>
 
         {/* Brand Colors */}
-        <section className="section-sm border-b border-hgf-neutral">
+        <section className="section-sm bg-white">
           <div className="container-page">
             <h2 className="text-2xl mb-6">Varumärkesfärger</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -68,7 +70,7 @@ export default function StyleguidePage() {
         </section>
 
         {/* Action Colors */}
-        <section className="section-sm border-b border-hgf-neutral">
+        <section className="section-sm bg-hgf-bg-light-blue">
           <div className="container-page">
             <h2 className="text-2xl mb-6">Funktionsfärger (Knappar & Länkar)</h2>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -112,7 +114,7 @@ export default function StyleguidePage() {
         </section>
 
         {/* Background Colors */}
-        <section className="section-sm border-b border-hgf-neutral">
+        <section className="section-sm bg-white">
           <div className="container-page">
             <h2 className="text-2xl mb-6">Bakgrundsfärger</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -156,7 +158,7 @@ export default function StyleguidePage() {
         </section>
 
         {/* Typography */}
-        <section className="section-sm border-b border-hgf-neutral">
+        <section className="section-sm bg-hgf-bg-light-blue">
           <div className="container-page">
             <h2 className="text-2xl mb-6">Typografi</h2>
             <div className="space-y-6">
@@ -214,7 +216,7 @@ export default function StyleguidePage() {
         </section>
 
         {/* Buttons */}
-        <section className="section-sm border-b border-hgf-neutral">
+        <section className="section-sm bg-white">
           <div className="container-page">
             <h2 className="text-2xl mb-6">Knappar</h2>
             <p className="text-sm text-hgf-black/70 mb-6">
@@ -289,7 +291,7 @@ export default function StyleguidePage() {
         </section>
 
         {/* Form Elements */}
-        <section className="section-sm border-b border-hgf-neutral">
+        <section className="section-sm bg-hgf-bg-light-blue">
           <div className="container-page">
             <h2 className="text-2xl mb-6">Formulärelement</h2>
 
@@ -360,7 +362,7 @@ export default function StyleguidePage() {
         </section>
 
         {/* Cards */}
-        <section className="section-sm border-b border-hgf-neutral">
+        <section className="section-sm bg-white">
           <div className="container-page">
             <h2 className="text-2xl mb-6">Kort</h2>
 
@@ -411,7 +413,7 @@ export default function StyleguidePage() {
         </section>
 
         {/* Badges */}
-        <section className="section-sm border-b border-hgf-neutral">
+        <section className="section-sm bg-hgf-bg-light-blue">
           <div className="container-page">
             <h2 className="text-2xl mb-6">Badges</h2>
             <div className="component-demo flex flex-wrap gap-4">
@@ -423,7 +425,7 @@ export default function StyleguidePage() {
         </section>
 
         {/* Spacing */}
-        <section className="section-sm">
+        <section className="section-sm bg-white">
           <div className="container-page">
             <h2 className="text-2xl mb-6">Spacing & Layout</h2>
             <div className="space-y-4">

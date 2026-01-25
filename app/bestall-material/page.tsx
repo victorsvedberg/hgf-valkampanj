@@ -51,7 +51,7 @@ export default function BestallMaterialPage() {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
-        <main className="flex-1 flex items-center justify-center">
+        <main className="flex-1 flex items-center justify-center bg-hgf-bg-light-blue">
           <div className="container-narrow py-16 text-center">
             <div className="w-20 h-20 bg-hgf-blue rounded-full flex items-center justify-center mx-auto mb-6">
               <Check className="h-10 w-10 text-white" />
