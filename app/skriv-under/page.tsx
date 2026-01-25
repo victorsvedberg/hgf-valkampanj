@@ -7,161 +7,257 @@ import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Card, CardContent } from "@/components/ui/card";
-import { Check } from "lucide-react";
+import { SignatureCounter } from "@/components/ui/signature-counter";
+import { ArrowRight, Check } from "lucide-react";
 
 export default function SkrivUnderPage() {
+  const [step, setStep] = useState<"form" | "extra" | "done">("form");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
-    postalCode: "",
     acceptTerms: false,
-    acceptNewsletter: false,
   });
+  const [extraData, setExtraData] = useState({
+    phone: "",
+    postnummer: "",
+  });
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
 
-    // TODO: Implementera Brevo-integration
-    // Simulerar API-anrop
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const response = await fetch("/api/petition/sign", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName: formData.firstName.trim(),
+          lastName: formData.lastName.trim(),
+          email: formData.email.trim(),
+        }),
+      });
 
-    console.log("Form data:", formData);
-    setIsSubmitting(false);
-    setIsSubmitted(true);
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Något gick fel");
+      }
+
+      setStep("extra");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Kunde inte skicka. Försök igen.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  if (isSubmitted) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 flex items-center justify-center bg-hgf-bg-light-blue">
-          <div className="container-narrow py-16 text-center">
-            <div className="w-20 h-20 bg-hgf-blue rounded-full flex items-center justify-center mx-auto mb-6">
-              <Check className="h-10 w-10 text-white" />
-            </div>
-            <h1 className="text-3xl md:text-4xl mb-4">Tack för din underskrift!</h1>
-            <p className="text-lg text-hgf-black/70 mb-8 max-w-md mx-auto">
-              Du har nu skrivit under uppropet mot marknadshyror.
-              Vi kommer att höra av oss med mer information.
-            </p>
-            <Button variant="outline" asChild>
-              <Link href="/">Tillbaka till startsidan</Link>
-            </Button>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
+  const handleExtraSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/petition/update-contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email.trim(),
+          phone: extraData.phone.trim() || undefined,
+          postnummer: extraData.postnummer.trim() || undefined,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Något gick fel");
+      }
+
+      setStep("done");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Kunde inte skicka. Försök igen.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const skipExtra = () => {
+    setStep("done");
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
 
       <main className="flex-1">
-        {/* Hero */}
-        <section className="bg-hgf-red py-16 md:py-24 text-center text-white">
-          <div className="container-narrow">
-            <span className="badge bg-white/20 text-white mb-4">Upprop</span>
-            <h1 className="text-white mb-4">Skriv under mot marknadshyror</h1>
-            <p className="text-xl text-white/90 max-w-xl mx-auto">
-              Visa ditt stöd genom att skriva under vårt upprop.
-              Tillsammans gör vi skillnad.
-            </p>
-          </div>
-        </section>
+        {/* Hero with integrated petition form */}
+        <section className="bg-hgf-red min-h-[80vh] flex items-center">
+          <div className="w-full py-16 md:py-24">
+            <div className="max-w-6xl mx-auto px-6 md:px-12">
+              <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                {/* Left: Message */}
+                <div className="text-white">
+                  <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
+                    Stoppa<br />marknadshyror
+                  </h1>
+                  <SignatureCounter goal={10000} className="max-w-md mb-8" />
+                  <p className="text-xl md:text-2xl text-white/90 max-w-lg">
+                    Skriv under uppropet och var med i kampen för rimliga hyror.
+                    Tillsammans gör vi skillnad.
+                  </p>
+                </div>
 
-        {/* Form */}
-        <section className="section bg-white">
-          <div className="container-narrow">
+                {/* Right: Form */}
+                <div>
+                  {step === "done" ? (
+                    <div className="bg-white rounded-2xl p-8 md:p-10 text-center">
+                      <div className="w-16 h-16 bg-hgf-blue rounded-full flex items-center justify-center mx-auto mb-6">
+                        <Check className="h-8 w-8 text-white" />
+                      </div>
+                      <h2 className="text-2xl font-bold text-hgf-black mb-3">
+                        Tack {formData.firstName}!
+                      </h2>
+                      <p className="text-hgf-black/70 mb-6">
+                        Du är nu en del av rörelsen. Vi hör av oss med mer information.
+                      </p>
+                      <Button variant="outline" asChild>
+                        <Link href="/kontakta-politiker">
+                          Nästa steg: Kontakta politiker
+                          <ArrowRight className="ml-2 h-4 w-4" />
+                        </Link>
+                      </Button>
+                    </div>
+                  ) : step === "extra" ? (
+                    <div className="bg-white rounded-2xl p-8 md:p-10">
+                      <div className="w-12 h-12 bg-hgf-blue rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Check className="h-6 w-6 text-white" />
+                      </div>
+                      <h2 className="text-2xl font-bold text-hgf-black mb-2 text-center">
+                        Tack för din underskrift!
+                      </h2>
+                      <p className="text-hgf-black/70 mb-6 text-center">
+                        Vill du hjälpa oss ännu mer? Med ditt postnummer och mobilnummer
+                        kan vi skicka relevanta uppdateringar och meddela dig när
+                        blixtaktioner sker i din närhet.
+                      </p>
 
-            <Card className="max-w-lg mx-auto">
-              <CardContent className="pt-6">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input
-                      label="Förnamn"
-                      placeholder="Anna"
-                      value={formData.firstName}
-                      onChange={(e) =>
-                        setFormData({ ...formData, firstName: e.target.value })
-                      }
-                      required
-                    />
-                    <Input
-                      label="Efternamn"
-                      placeholder="Andersson"
-                      value={formData.lastName}
-                      onChange={(e) =>
-                        setFormData({ ...formData, lastName: e.target.value })
-                      }
-                      required
-                    />
-                  </div>
+                      <form onSubmit={handleExtraSubmit} className="space-y-4">
+                        <Input
+                          type="tel"
+                          placeholder="Mobilnummer (t.ex. 070-123 45 67)"
+                          value={extraData.phone}
+                          onChange={(e) =>
+                            setExtraData({ ...extraData, phone: e.target.value })
+                          }
+                        />
+                        <Input
+                          placeholder="Postnummer (t.ex. 114 40)"
+                          value={extraData.postnummer}
+                          onChange={(e) =>
+                            setExtraData({ ...extraData, postnummer: e.target.value })
+                          }
+                        />
 
-                  <Input
-                    label="E-post"
-                    type="email"
-                    placeholder="anna@exempel.se"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                    required
-                  />
+                        {error && (
+                          <p className="text-red-600 text-sm">{error}</p>
+                        )}
 
-                  <Input
-                    label="Postnummer"
-                    placeholder="123 45"
-                    value={formData.postalCode}
-                    onChange={(e) =>
-                      setFormData({ ...formData, postalCode: e.target.value })
-                    }
-                    hint="Används för att visa lokala aktiviteter"
-                  />
+                        <Button
+                          type="submit"
+                          variant="red"
+                          className="w-full"
+                          size="lg"
+                          loading={isSubmitting}
+                        >
+                          Spara uppgifter
+                        </Button>
+                        <button
+                          type="button"
+                          onClick={skipExtra}
+                          className="w-full text-sm text-hgf-black/50 hover:text-hgf-black transition-colors"
+                        >
+                          Hoppa över
+                        </button>
+                      </form>
+                    </div>
+                  ) : (
+                    <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-8 md:p-10">
+                      <h2 className="text-2xl font-bold text-hgf-black mb-6">
+                        Skriv under nu
+                      </h2>
 
-                  <div className="space-y-4 pt-2">
-                    <Checkbox
-                      label="Jag godkänner att Hyresgästföreningen lagrar mina uppgifter enligt integritetspolicyn"
-                      checked={formData.acceptTerms}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          acceptTerms: (e.target as HTMLInputElement).checked,
-                        })
-                      }
-                      required
-                    />
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <Input
+                            placeholder="Förnamn"
+                            value={formData.firstName}
+                            onChange={(e) =>
+                              setFormData({ ...formData, firstName: e.target.value })
+                            }
+                            required
+                          />
+                          <Input
+                            placeholder="Efternamn"
+                            value={formData.lastName}
+                            onChange={(e) =>
+                              setFormData({ ...formData, lastName: e.target.value })
+                            }
+                            required
+                          />
+                        </div>
 
-                    <Checkbox
-                      label="Jag vill få nyheter och uppdateringar om kampanjen via e-post"
-                      checked={formData.acceptNewsletter}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          acceptNewsletter: (e.target as HTMLInputElement).checked,
-                        })
-                      }
-                    />
-                  </div>
+                        <Input
+                          type="email"
+                          placeholder="E-postadress"
+                          value={formData.email}
+                          onChange={(e) =>
+                            setFormData({ ...formData, email: e.target.value })
+                          }
+                          required
+                        />
 
-                  <Button
-                    type="submit"
-                    variant="red"
-                    className="w-full"
-                    size="lg"
-                    loading={isSubmitting}
-                  >
-                    Skriv under uppropet
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
+                        <Checkbox
+                          label="Jag godkänner att mina uppgifter lagras enligt integritetspolicyn"
+                          checked={formData.acceptTerms}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              acceptTerms: (e.target as HTMLInputElement).checked,
+                            })
+                          }
+                          required
+                        />
+                      </div>
+
+                      {error && (
+                        <p className="text-red-600 text-sm mt-4">{error}</p>
+                      )}
+
+                      <Button
+                        type="submit"
+                        variant="red"
+                        className="w-full mt-6"
+                        size="lg"
+                        loading={isSubmitting}
+                      >
+                        Skriv under uppropet
+                        <ArrowRight className="ml-2 h-5 w-5" />
+                      </Button>
+
+                      <p className="text-xs text-hgf-black/50 mt-4 text-center">
+                        Genom att skriva under stödjer du kampen mot marknadshyror
+                      </p>
+                    </form>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </section>
       </main>
