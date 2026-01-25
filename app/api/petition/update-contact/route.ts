@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     const attributes: Record<string, string> = {};
 
     if (phone) {
-      // Formatera telefonnummer - ta bort mellanslag och lägg till +46 om det saknas
+      // Formatera telefonnummer - ta bort mellanslag och bindestreck
       let formattedPhone = phone.replace(/[\s-]/g, "");
 
       // Om numret börjar med 0, byt till +46
@@ -33,6 +33,16 @@ export async function POST(request: NextRequest) {
       // Om numret inte har landskod, lägg till +46
       else if (!formattedPhone.startsWith("+")) {
         formattedPhone = "+46" + formattedPhone;
+      }
+
+      // Validera att det är ett giltigt svenskt mobilnummer
+      // +46 följt av 9 siffror (totalt 12 tecken)
+      const phoneRegex = /^\+46[0-9]{9}$/;
+      if (!phoneRegex.test(formattedPhone)) {
+        return NextResponse.json(
+          { error: "Ogiltigt telefonnummer. Ange ett svenskt mobilnummer (t.ex. 070-123 45 67)" },
+          { status: 400 }
+        );
       }
 
       attributes.SMS = formattedPhone;

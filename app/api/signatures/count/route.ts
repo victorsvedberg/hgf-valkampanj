@@ -1,20 +1,26 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { getSignatureCount, DEFAULT_PETITION_ID } from "@/lib/signatures";
 
-export async function GET() {
-  // TODO: Hämta riktigt antal från Brevo eller databas
-  // Exempel med Brevo:
-  // const response = await fetch("https://api.brevo.com/v3/contacts", {
-  //   headers: { "api-key": process.env.BREVO_API_KEY! },
-  // });
-  // const data = await response.json();
-  // return NextResponse.json({ count: data.count });
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const petitionId = searchParams.get("petitionId") || DEFAULT_PETITION_ID;
 
-  // Dummy-data för nu
-  const count = 6713;
+  try {
+    const { count, goal } = await getSignatureCount(petitionId);
 
-  return NextResponse.json({
-    count,
-    goal: 10000,
-    updatedAt: new Date().toISOString(),
-  });
+    return NextResponse.json({
+      count,
+      goal,
+      updatedAt: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error("Error fetching signature count:", error);
+
+    // Fallback to default values on error
+    return NextResponse.json({
+      count: 0,
+      goal: 10000,
+      updatedAt: new Date().toISOString(),
+    });
+  }
 }

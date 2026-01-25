@@ -8,7 +8,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SignatureCounter } from "@/components/ui/signature-counter";
+import { SocialProofTicker } from "@/components/ui/social-proof-ticker";
 import { ArrowRight, Check } from "lucide-react";
+
+// Type for window extensions
+declare global {
+  interface Window {
+    __incrementSignatureCount?: (amount?: number) => void;
+    __updateSignatureCount?: (count: number) => void;
+    __addSigner?: (name: string) => void;
+  }
+}
 
 export default function SkrivUnderPage() {
   const [step, setStep] = useState<"form" | "extra" | "done">("form");
@@ -30,6 +40,11 @@ export default function SkrivUnderPage() {
     setIsSubmitting(true);
     setError(null);
 
+    // Optimistic update: increment counter immediately
+    if (typeof window !== "undefined" && window.__incrementSignatureCount) {
+      window.__incrementSignatureCount(1);
+    }
+
     try {
       const response = await fetch("/api/petition/sign", {
         method: "POST",
@@ -43,14 +58,39 @@ export default function SkrivUnderPage() {
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const data = await response.json();
+        // Rollback optimistic update on error
+        if (typeof window !== "undefined" && window.__incrementSignatureCount) {
+          window.__incrementSignatureCount(-1);
+        }
         throw new Error(data.error || "Något gick fel");
+      }
+
+      // Update counter with actual count from server
+      if (
+        typeof window !== "undefined" &&
+        window.__updateSignatureCount &&
+        data.newCount
+      ) {
+        window.__updateSignatureCount(data.newCount);
+      }
+
+      // Add to social proof ticker
+      if (
+        typeof window !== "undefined" &&
+        window.__addSigner &&
+        data.displayName
+      ) {
+        window.__addSigner(data.displayName);
       }
 
       setStep("extra");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Kunde inte skicka. Försök igen.");
+      setError(
+        err instanceof Error ? err.message : "Kunde inte skicka. Försök igen."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -106,7 +146,8 @@ export default function SkrivUnderPage() {
                   <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
                     Stoppa<br />marknadshyror
                   </h1>
-                  <SignatureCounter goal={10000} className="max-w-md mb-8" />
+                  <SignatureCounter goal={100} className="max-w-md mb-4" />
+                  <SocialProofTicker className="mb-6" />
                   <p className="text-xl md:text-2xl text-white/90 max-w-lg">
                     Skriv under uppropet och var med i kampen för rimliga hyror.
                     Tillsammans gör vi skillnad.

@@ -2,7 +2,7 @@
 
 import { use } from "react";
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Calendar,
@@ -116,7 +116,30 @@ export default function AdminPage({
                 <li>Två steg: 1) Namn + e-post → 2) Valfritt telefon + postnummer</li>
                 <li>Skapar kontakt i Brevo med attribut: <code className="bg-hgf-neutral/30 px-1 rounded">HAS_SIGNED_PETITION</code>, <code className="bg-hgf-neutral/30 px-1 rounded">PETITION_SIGNED_DATE</code></li>
                 <li>Lägger till kontakt i Brevo-listan &quot;Stoppa Marknadshyror 2026&quot; (list ID 3)</li>
-                <li>Signaturräknare på startsidan hämtar antal från Brevo</li>
+              </ul>
+
+              <h5 className="font-medium mt-4 mb-2 text-hgf-black/80">Signaturräknare & Social Proof:</h5>
+              <ul className="text-sm text-hgf-black/70 space-y-1 ml-6 list-disc">
+                <li><strong>Optimistic updates:</strong> Räknaren ökar direkt vid submit, rullas tillbaka vid fel</li>
+                <li><strong>Social proof ticker:</strong> Visar senaste underskrifter (&quot;Anna skrev under för 3 min sedan&quot;)</li>
+                <li><strong>Svensk namnvalidering:</strong> ~25 000 namn från SCB - ogiltiga namn visas som &quot;En supporter&quot;</li>
+                <li><strong>Auto-sync från Brevo:</strong> Synkar automatiskt var 5:e minut (stale-while-revalidate)</li>
+                <li><strong>In-memory cache:</strong> 10s TTL för snabb respons</li>
+              </ul>
+
+              <h5 className="font-medium mt-4 mb-2 text-hgf-black/80">Datafiler:</h5>
+              <ul className="text-sm text-hgf-black/70 space-y-1 ml-6 list-disc">
+                <li><code className="bg-hgf-neutral/30 px-1 rounded">data/petitions.json</code> - Uppropskonfiguration (mål, count, brevoListId)</li>
+                <li><code className="bg-hgf-neutral/30 px-1 rounded">data/recent-signatures.json</code> - Senaste 24h underskrifter för ticker</li>
+                <li><code className="bg-hgf-neutral/30 px-1 rounded">data/swedish-names.json</code> - Svenska förnamn för validering</li>
+              </ul>
+
+              <h5 className="font-medium mt-4 mb-2 text-hgf-black/80">API-endpoints:</h5>
+              <ul className="text-sm text-hgf-black/70 space-y-1 ml-6 list-disc">
+                <li><code className="bg-hgf-neutral/30 px-1 rounded">GET /api/signatures/count</code> - Hämta antal + mål</li>
+                <li><code className="bg-hgf-neutral/30 px-1 rounded">GET /api/signatures/recent</code> - Senaste underskrifter för ticker</li>
+                <li><code className="bg-hgf-neutral/30 px-1 rounded">POST /api/petition/sign</code> - Ny underskrift (returnerar newCount, displayName)</li>
+                <li><code className="bg-hgf-neutral/30 px-1 rounded">POST /api/internal/sync-brevo</code> - Manuell sync (kräver INTERNAL_API_KEY)</li>
               </ul>
             </div>
 
@@ -273,6 +296,7 @@ export default function AdminPage({
                 <div>BREVO_SENDER_EMAIL=xxx</div>
                 <div>BREVO_SENDER_NAME=xxx</div>
                 <div>ADMIN_SECRET_TOKEN=xxx</div>
+                <div>INTERNAL_API_KEY=xxx <span className="text-white/50"># För manuell Brevo-sync</span></div>
               </div>
             </div>
           </CardContent>

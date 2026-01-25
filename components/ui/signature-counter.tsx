@@ -1,10 +1,13 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 interface SignatureCounterProps {
+  petitionId?: string;
   goal?: number;
   className?: string;
+  /** Polling interval in ms (default 30s) */
+  pollInterval?: number;
 }
 
 // Animera ett nummer från 0 till target
@@ -12,9 +15,19 @@ function useCountUp(target: number, duration: number = 2000) {
   const [count, setCount] = useState(0);
   const startTime = useRef<number | null>(null);
   const rafRef = useRef<number | null>(null);
+  const prevTarget = useRef(target);
 
   useEffect(() => {
     if (target === 0) return;
+
+    // If target increased by a small amount (optimistic update), animate from current
+    const startValue =
+      prevTarget.current > 0 && target - prevTarget.current <= 5
+        ? prevTarget.current
+        : 0;
+
+    prevTarget.current = target;
+    startTime.current = null;
 
     const animate = (timestamp: number) => {
       if (!startTime.current) startTime.current = timestamp;
@@ -22,7 +35,7 @@ function useCountUp(target: number, duration: number = 2000) {
 
       // Ease out cubic för snyggare animation
       const easeOut = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.floor(easeOut * target));
+      setCount(Math.floor(startValue + easeOut * (target - startValue)));
 
       if (progress < 1) {
         rafRef.current = requestAnimationFrame(animate);
@@ -45,8 +58,10 @@ function formatNumber(num: number): string {
 }
 
 export function SignatureCounter({
+  petitionId = "stoppa-marknadshyror-2026",
   goal = 10000,
-  className = ""
+  className = "",
+  pollInterval = 30000,
 }: SignatureCounterProps) {
   const [signatures, setSignatures] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -54,23 +69,72 @@ export function SignatureCounter({
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Hämta antal underskrifter
-  useEffect(() => {
-    async function fetchSignatures() {
-      try {
-        const response = await fetch("/api/signatures/count");
-        const data = await response.json();
-        setSignatures(data.count);
-      } catch (error) {
-        console.error("Failed to fetch signatures:", error);
-        // Fallback till dummy-data
-        setSignatures(6713);
-      } finally {
-        setIsLoading(false);
-      }
+  const fetchSignatures = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `/api/signatures/count?petitionId=${petitionId}`
+      );
+      const data = await response.json();
+      setSignatures(data.count);
+    } catch (error) {
+      console.error("Failed to fetch signatures:", error);
+    } finally {
+      setIsLoading(false);
     }
+  }, [petitionId]);
 
+  // Initial fetch
+  useEffect(() => {
     fetchSignatures();
+  }, [fetchSignatures]);
+
+  // Polling for updates
+  useEffect(() => {
+    if (pollInterval <= 0) return;
+
+    const interval = setInterval(fetchSignatures, pollInterval);
+    return () => clearInterval(interval);
+  }, [fetchSignatures, pollInterval]);
+
+  // Optimistic increment method (called from parent)
+  const incrementCount = useCallback((amount: number = 1) => {
+    setSignatures((prev) => prev + amount);
   }, []);
+
+  // Update count to a specific value (e.g., after API response)
+  const updateCount = useCallback((newCount: number) => {
+    setSignatures(newCount);
+  }, []);
+
+  // Expose methods for parent components
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      (
+        window as unknown as {
+          __incrementSignatureCount?: (amount?: number) => void;
+          __updateSignatureCount?: (count: number) => void;
+        }
+      ).__incrementSignatureCount = incrementCount;
+      (
+        window as unknown as {
+          __incrementSignatureCount?: (amount?: number) => void;
+          __updateSignatureCount?: (count: number) => void;
+        }
+      ).__updateSignatureCount = updateCount;
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        delete (
+          window as unknown as {
+            __incrementSignatureCount?: (amount?: number) => void;
+          }
+        ).__incrementSignatureCount;
+        delete (
+          window as unknown as { __updateSignatureCount?: (count: number) => void }
+        ).__updateSignatureCount;
+      }
+    };
+  }, [incrementCount, updateCount]);
 
   // Starta animation när komponenten blir synlig
   useEffect(() => {
@@ -103,9 +167,7 @@ export function SignatureCounter({
         <span className="text-white font-bold text-xl md:text-2xl">
           {formatNumber(animatedCount)} underskrifter
         </span>
-        <span className="text-white/80 text-sm">
-          Mål: {formatNumber(goal)}
-        </span>
+        <span className="text-white/80 text-sm">Mål: {formatNumber(goal)}</span>
       </div>
 
       {/* Progress bar */}
