@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// Lista för materialbeställningar (skapa i Brevo om den inte finns)
-const MATERIAL_LIST_ID = 4; // Uppdatera till rätt list-ID
+// Lista för materialbeställningar
+const MATERIAL_LIST_ID = 6;
 
 interface MaterialOrderRequest {
   firstName: string;

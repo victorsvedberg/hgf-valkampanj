@@ -171,7 +171,7 @@ export default function AdminPage({
                 <li>Formulär på <code className="bg-hgf-neutral/30 px-1 rounded">/bestall-material</code></li>
                 <li>Samlar in: namn, e-post, telefon, leveransadress, antal dörrhängare</li>
                 <li>Skapar kontakt i Brevo med attribut: <code className="bg-hgf-neutral/30 px-1 rounded">HAS_ORDERED_MATERIAL</code>, <code className="bg-hgf-neutral/30 px-1 rounded">MATERIAL_QUANTITY</code></li>
-                <li>Lägger till kontakt i Brevo-listan för materialbeställningar (list ID 4)</li>
+                <li>Lägger till kontakt i Brevo-listan för materialbeställningar (list ID 6)</li>
                 <li>OBS: Fysisk hantering/utskick sker manuellt via Brevo-listan</li>
               </ul>
             </div>
@@ -231,7 +231,7 @@ export default function AdminPage({
               <h4 className="font-medium mb-2">Listor & Mappar:</h4>
               <ul className="text-hgf-black/70 space-y-1 ml-4 list-disc">
                 <li><strong>Lista 3:</strong> &quot;Stoppa Marknadshyror 2026&quot; (upprop)</li>
-                <li><strong>Lista 4:</strong> Materialbeställningar (dörrhängare)</li>
+                <li><strong>Lista 6:</strong> Materialbeställningar (dörrhängare)</li>
                 <li><strong>Mapp &quot;Aktiviteter&quot;:</strong> Innehåller en lista per aktivitet</li>
               </ul>
             </div>
