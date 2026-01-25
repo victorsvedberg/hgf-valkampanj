@@ -13,7 +13,6 @@ import {
   ArrowRight,
   ExternalLink,
   CheckCircle,
-  Clock
 } from "lucide-react";
 
 export default function AdminPage({
@@ -176,6 +175,21 @@ export default function AdminPage({
               </ul>
             </div>
 
+            {/* Bli aktiv */}
+            <div>
+              <h4 className="font-semibold flex items-center gap-2 mb-2">
+                <Users className="h-4 w-4 text-hgf-blue" />
+                Bli aktiv medlem
+              </h4>
+              <ul className="text-sm text-hgf-black/70 space-y-1 ml-6 list-disc">
+                <li>Formulär på <code className="bg-hgf-neutral/30 px-1 rounded">/bli-aktiv</code></li>
+                <li>Samlar in: namn, kontaktuppgifter, region, intressen, erfarenhet, tillgänglighet</li>
+                <li>Intressen: dörrknackning, ringaktiviteter, lokala event, digitalt arbete</li>
+                <li>Skapar kontakt i Brevo med attribut: <code className="bg-hgf-neutral/30 px-1 rounded">IS_VOLUNTEER</code>, <code className="bg-hgf-neutral/30 px-1 rounded">VOLUNTEER_REGION</code>, <code className="bg-hgf-neutral/30 px-1 rounded">VOLUNTEER_INTERESTS</code></li>
+                <li>Lägger till kontakt i Brevo-listan för aktiva (list ID 7)</li>
+              </ul>
+            </div>
+
             {/* Ortssökning */}
             <div>
               <h4 className="font-semibold flex items-center gap-2 mb-2">
@@ -226,6 +240,13 @@ export default function AdminPage({
                   "HAS_ORDERED_MATERIAL",
                   "MATERIAL_ORDER_DATE",
                   "MATERIAL_QUANTITY",
+                  "IS_VOLUNTEER",
+                  "VOLUNTEER_SIGNUP_DATE",
+                  "VOLUNTEER_REGION",
+                  "VOLUNTEER_INTERESTS",
+                  "VOLUNTEER_EXPERIENCE",
+                  "VOLUNTEER_AVAILABILITY",
+                  "WANTS_NEWSLETTER",
                   "SOURCE",
                 ].map((attr) => (
                   <code key={attr} className="bg-hgf-neutral/30 px-2 py-1 rounded text-xs">
@@ -240,6 +261,7 @@ export default function AdminPage({
               <ul className="text-hgf-black/70 space-y-1 ml-4 list-disc">
                 <li><strong>Lista 3:</strong> &quot;Stoppa Marknadshyror 2026&quot; (upprop)</li>
                 <li><strong>Lista 6:</strong> Materialbeställningar (dörrhängare)</li>
+                <li><strong>Lista 7:</strong> Aktiva medlemmar / Volontärer</li>
                 <li><strong>Mapp &quot;Aktiviteter&quot;:</strong> Innehåller en lista per aktivitet</li>
               </ul>
             </div>
@@ -305,23 +327,7 @@ export default function AdminPage({
           </CardContent>
         </Card>
 
-        {/* Not yet implemented */}
-        <Card className="border-dashed">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-hgf-black/50">
-              <Clock className="h-5 w-5" />
-              Ej implementerat ännu
-            </CardTitle>
-            <CardDescription>Dessa funktioner har UI men saknar backend-integration</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4 text-sm text-hgf-black/60">
-            <div>
-              <h4 className="font-medium mb-1">Bli aktiv medlem</h4>
-              <p>Formulär finns på <code className="bg-hgf-neutral/30 px-1 rounded">/bli-aktiv</code>. Behöver: Brevo-integration + ev. Notion-webhook för screening.</p>
-            </div>
-          </CardContent>
-        </Card>
-
+        
         {/* Footer */}
         <div className="text-center text-sm text-hgf-black/50 pt-4">
           <p>Byggd med Next.js · Styling: Tailwind CSS · CRM: Brevo</p>
