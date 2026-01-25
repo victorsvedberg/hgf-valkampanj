@@ -202,6 +202,14 @@ export default function AdminPage({
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <div>
+              <h4 className="font-medium mb-2">Telefonnummerformatering:</h4>
+              <p className="text-hgf-black/70 mb-4">
+                Telefonnummer formateras automatiskt till internationellt format innan de sparas.
+                T.ex. <code className="bg-hgf-neutral/30 px-1 rounded">070-123 45 67</code> → <code className="bg-hgf-neutral/30 px-1 rounded">+46701234567</code>
+              </p>
+            </div>
+
+            <div>
               <h4 className="font-medium mb-2">Kontaktattribut som används:</h4>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {[

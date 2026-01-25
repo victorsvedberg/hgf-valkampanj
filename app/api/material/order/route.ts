@@ -38,6 +38,35 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Bygg attribut - endast inkludera fält med värden
+    const attributes: Record<string, string | boolean> = {
+      FIRSTNAME: firstName,
+      LASTNAME: lastName,
+      POSTALCODE: postalCode.replace(/\s/g, ""),
+      CITY: city,
+      ADDRESS: address,
+      HAS_ORDERED_MATERIAL: true,
+      MATERIAL_ORDER_DATE: new Date().toISOString().split("T")[0],
+      MATERIAL_QUANTITY: quantity,
+      SOURCE: "hemsida",
+    };
+
+    // Formatera telefonnummer om det finns
+    if (phone) {
+      let formattedPhone = phone.replace(/[\s-]/g, "");
+      if (formattedPhone.startsWith("0")) {
+        formattedPhone = "+46" + formattedPhone.slice(1);
+      } else if (!formattedPhone.startsWith("+")) {
+        formattedPhone = "+46" + formattedPhone;
+      }
+      attributes.SMS = formattedPhone;
+    }
+
+    // Lägg till meddelande om det finns
+    if (message) {
+      attributes.MATERIAL_MESSAGE = message;
+    }
+
     // Skapa/uppdatera kontakt i Brevo
     const response = await fetch("https://api.brevo.com/v3/contacts", {
       method: "POST",
@@ -47,19 +76,7 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify({
         email,
-        attributes: {
-          FIRSTNAME: firstName,
-          LASTNAME: lastName,
-          SMS: phone || undefined,
-          POSTALCODE: postalCode,
-          CITY: city,
-          ADDRESS: address,
-          HAS_ORDERED_MATERIAL: true,
-          MATERIAL_ORDER_DATE: new Date().toISOString().split("T")[0],
-          MATERIAL_QUANTITY: quantity,
-          MATERIAL_MESSAGE: message || undefined,
-          SOURCE: "hemsida",
-        },
+        attributes,
         listIds: [MATERIAL_LIST_ID],
         updateEnabled: true,
       }),
@@ -82,19 +99,7 @@ export async function POST(request: NextRequest) {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              attributes: {
-                FIRSTNAME: firstName,
-                LASTNAME: lastName,
-                SMS: phone || undefined,
-                POSTALCODE: postalCode,
-                CITY: city,
-                ADDRESS: address,
-                HAS_ORDERED_MATERIAL: true,
-                MATERIAL_ORDER_DATE: new Date().toISOString().split("T")[0],
-                MATERIAL_QUANTITY: quantity,
-                MATERIAL_MESSAGE: message || undefined,
-                SOURCE: "hemsida",
-              },
+              attributes,
               listIds: [MATERIAL_LIST_ID],
             }),
           }
