@@ -116,7 +116,7 @@ export default function AdminPage({
                 <li>Formulär på startsidan + dedikerad sida <code className="bg-hgf-neutral/30 px-1 rounded">/skriv-under</code></li>
                 <li>Två steg: 1) Namn + e-post → 2) Valfritt telefon + postnummer</li>
                 <li>Skapar kontakt i Brevo med attribut: <code className="bg-hgf-neutral/30 px-1 rounded">HAS_SIGNED_PETITION</code>, <code className="bg-hgf-neutral/30 px-1 rounded">PETITION_SIGNED_DATE</code></li>
-                <li>Lägger till kontakt i Brevo-listan "Stoppa Marknadshyror 2026" (list ID 3)</li>
+                <li>Lägger till kontakt i Brevo-listan &quot;Stoppa Marknadshyror 2026&quot; (list ID 3)</li>
                 <li>Signaturräknare på startsidan hämtar antal från Brevo</li>
               </ul>
             </div>
@@ -146,7 +146,7 @@ export default function AdminPage({
                 <li>Publik sida: <code className="bg-hgf-neutral/30 px-1 rounded">/aktiviteter</code></li>
                 <li>Admin: <code className="bg-hgf-neutral/30 px-1 rounded">/admin/[token]/aktiviteter</code></li>
                 <li>
-                  <strong>Skapa aktivitet:</strong> Skapar automatiskt en Brevo-lista i mappen "Aktiviteter"
+                  <strong>Skapa aktivitet:</strong> Skapar automatiskt en Brevo-lista i mappen &quot;Aktiviteter&quot;
                 </li>
                 <li>
                   <strong>Anmälan:</strong> Lägger till kontakt i aktivitetens specifika Brevo-lista
@@ -210,8 +210,8 @@ export default function AdminPage({
             <div>
               <h4 className="font-medium mb-2">Listor & Mappar:</h4>
               <ul className="text-hgf-black/70 space-y-1 ml-4 list-disc">
-                <li><strong>Lista 3:</strong> "Stoppa Marknadshyror 2026" (upprop)</li>
-                <li><strong>Mapp "Aktiviteter":</strong> Innehåller en lista per aktivitet</li>
+                <li><strong>Lista 3:</strong> &quot;Stoppa Marknadshyror 2026&quot; (upprop)</li>
+                <li><strong>Mapp &quot;Aktiviteter&quot;:</strong> Innehåller en lista per aktivitet</li>
               </ul>
             </div>
 

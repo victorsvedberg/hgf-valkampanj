@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, useCallback, use } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,7 +48,7 @@ export default function AdminAktiviteterPage({
     isOnline: false,
   });
 
-  const fetchActivities = async () => {
+  const fetchActivities = useCallback(async () => {
     try {
       const response = await fetch(`/api/admin/${token}/activities`);
       if (!response.ok) {
@@ -64,11 +64,11 @@ export default function AdminAktiviteterPage({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     fetchActivities();
-  }, [token]);
+  }, [fetchActivities]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
