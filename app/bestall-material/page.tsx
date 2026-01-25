@@ -22,6 +22,7 @@ const materialOptions = [
 export default function BestallMaterialPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -38,13 +39,38 @@ export default function BestallMaterialPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
 
-    // TODO: Implementera Brevo-integration
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const response = await fetch("/api/material/order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName: formData.firstName.trim(),
+          lastName: formData.lastName.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim() || undefined,
+          address: formData.address.trim(),
+          postalCode: formData.postalCode.trim(),
+          city: formData.city.trim(),
+          quantity: formData.quantity,
+          message: formData.message.trim() || undefined,
+        }),
+      });
 
-    console.log("Beställning:", formData);
-    setIsSubmitting(false);
-    setIsSubmitted(true);
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Något gick fel");
+      }
+
+      setIsSubmitted(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Kunde inte skicka beställningen. Försök igen.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (isSubmitted) {
@@ -119,6 +145,12 @@ export default function BestallMaterialPage() {
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleSubmit} className="space-y-6">
+                    {error && (
+                      <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                        {error}
+                      </div>
+                    )}
+
                     <div className="grid grid-cols-2 gap-4">
                       <Input
                         label="Förnamn"

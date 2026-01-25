@@ -161,6 +161,21 @@ export default function AdminPage({
               </ul>
             </div>
 
+            {/* Beställ material */}
+            <div>
+              <h4 className="font-semibold flex items-center gap-2 mb-2">
+                <FileText className="h-4 w-4 text-hgf-red" />
+                Beställ material
+              </h4>
+              <ul className="text-sm text-hgf-black/70 space-y-1 ml-6 list-disc">
+                <li>Formulär på <code className="bg-hgf-neutral/30 px-1 rounded">/bestall-material</code></li>
+                <li>Samlar in: namn, e-post, telefon, leveransadress, antal dörrhängare</li>
+                <li>Skapar kontakt i Brevo med attribut: <code className="bg-hgf-neutral/30 px-1 rounded">HAS_ORDERED_MATERIAL</code>, <code className="bg-hgf-neutral/30 px-1 rounded">MATERIAL_QUANTITY</code></li>
+                <li>Lägger till kontakt i Brevo-listan för materialbeställningar (list ID 4)</li>
+                <li>OBS: Fysisk hantering/utskick sker manuellt via Brevo-listan</li>
+              </ul>
+            </div>
+
             {/* Ortssökning */}
             <div>
               <h4 className="font-semibold flex items-center gap-2 mb-2">
@@ -194,10 +209,15 @@ export default function AdminPage({
                   "LASTNAME",
                   "SMS (telefon)",
                   "POSTALCODE",
+                  "CITY",
+                  "ADDRESS",
                   "HAS_SIGNED_PETITION",
                   "PETITION_SIGNED_DATE",
                   "HAS_CONTACTED_POLITICIAN",
                   "LAST_POLITICIAN_CONTACT",
+                  "HAS_ORDERED_MATERIAL",
+                  "MATERIAL_ORDER_DATE",
+                  "MATERIAL_QUANTITY",
                   "SOURCE",
                 ].map((attr) => (
                   <code key={attr} className="bg-hgf-neutral/30 px-2 py-1 rounded text-xs">
@@ -211,6 +231,7 @@ export default function AdminPage({
               <h4 className="font-medium mb-2">Listor & Mappar:</h4>
               <ul className="text-hgf-black/70 space-y-1 ml-4 list-disc">
                 <li><strong>Lista 3:</strong> &quot;Stoppa Marknadshyror 2026&quot; (upprop)</li>
+                <li><strong>Lista 4:</strong> Materialbeställningar (dörrhängare)</li>
                 <li><strong>Mapp &quot;Aktiviteter&quot;:</strong> Innehåller en lista per aktivitet</li>
               </ul>
             </div>
@@ -286,10 +307,6 @@ export default function AdminPage({
             <CardDescription>Dessa funktioner har UI men saknar backend-integration</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 text-sm text-hgf-black/60">
-            <div>
-              <h4 className="font-medium mb-1">Beställ material</h4>
-              <p>Formulär finns på <code className="bg-hgf-neutral/30 px-1 rounded">/bestall-material</code>. Behöver: notifikation till HGF för fysisk hantering.</p>
-            </div>
             <div>
               <h4 className="font-medium mb-1">Bli aktiv medlem</h4>
               <p>Formulär finns på <code className="bg-hgf-neutral/30 px-1 rounded">/bli-aktiv</code>. Behöver: Brevo-integration + ev. Notion-webhook för screening.</p>
