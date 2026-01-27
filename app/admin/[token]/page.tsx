@@ -127,10 +127,10 @@ export default function AdminPage({
                 <li><strong>In-memory cache:</strong> 10s TTL för snabb respons</li>
               </ul>
 
-              <h5 className="font-medium mt-4 mb-2 text-hgf-black/80">Datafiler:</h5>
+              <h5 className="font-medium mt-4 mb-2 text-hgf-black/80">Databas (Neon Postgres):</h5>
               <ul className="text-sm text-hgf-black/70 space-y-1 ml-6 list-disc">
-                <li><code className="bg-hgf-neutral/30 px-1 rounded">data/petitions.json</code> - Uppropskonfiguration (mål, count, brevoListId)</li>
-                <li><code className="bg-hgf-neutral/30 px-1 rounded">data/recent-signatures.json</code> - Senaste 24h underskrifter för ticker</li>
+                <li><code className="bg-hgf-neutral/30 px-1 rounded">petitions</code> - Uppropskonfiguration (mål, count, brevoListId)</li>
+                <li><code className="bg-hgf-neutral/30 px-1 rounded">signatures</code> - Senaste 24h underskrifter för ticker</li>
                 <li><code className="bg-hgf-neutral/30 px-1 rounded">data/swedish-names.json</code> - Svenska förnamn för validering</li>
               </ul>
 
