@@ -13,12 +13,14 @@ function createSqlClient() {
 }
 
 // Create client lazily on first use (not at module load time)
-let _sql: ReturnType<typeof neon> | null = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let _sql: any = null;
 
 export function sql(
   strings: TemplateStringsArray,
   ...values: unknown[]
-): ReturnType<ReturnType<typeof neon>> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+): Promise<any[]> {
   if (!_sql) {
     _sql = createSqlClient();
   }
