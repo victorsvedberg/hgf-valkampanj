@@ -36,7 +36,12 @@ export function Footer() {
                 </li>
                 <li>
                   <Link href="/bestall-material" className="text-white/80 hover:text-white text-sm transition-colors">
-                    Beställ material
+                    Beställ kampanjmaterial
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/material" className="text-white/80 hover:text-white text-sm transition-colors">
+                    Ladda ner kampanjmaterial
                   </Link>
                 </li>
                 <li>
@@ -58,6 +63,11 @@ export function Footer() {
                 Om kampanjen
               </h4>
               <ul className="space-y-2">
+                <li>
+                  <Link href="/nyheter" className="text-white/80 hover:text-white text-sm transition-colors">
+                    Nyheter
+                  </Link>
+                </li>
                 <li>
                   <a
                     href="https://www.hyresgastforeningen.se/stod-och-rad/marknadshyror/"
