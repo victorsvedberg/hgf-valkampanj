@@ -179,7 +179,7 @@ export default function AdminPage({
                 <li>
                   <strong>Export:</strong> CSV-export av deltagarlista per aktivitet
                 </li>
-                <li>Aktiviteter sparas i <code className="bg-hgf-neutral/30 px-1 rounded">data/activities.json</code></li>
+                <li>Aktiviteter sparas i <code className="bg-hgf-neutral/30 px-1 rounded">Neon Postgres</code></li>
               </ul>
             </div>
 

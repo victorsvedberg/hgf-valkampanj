@@ -1,20 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readFileSync } from "fs";
-import { join } from "path";
-
-const DATA_PATH = join(process.cwd(), "data/activities.json");
-
-interface Activity {
-  id: string;
-  title: string;
-  brevoListId: number;
-  [key: string]: unknown;
-}
-
-interface ActivitiesData {
-  folderId: number | null;
-  activities: Activity[];
-}
+import { sql } from "@/lib/db";
 
 interface RegisterRequest {
   firstName: string;
@@ -43,16 +28,18 @@ export async function POST(
     }
 
     // Hitta aktiviteten
-    const content = readFileSync(DATA_PATH, "utf-8");
-    const data: ActivitiesData = JSON.parse(content);
-    const activity = data.activities.find((a) => a.id === id);
+    const rows = await sql`
+      SELECT id, title, brevo_list_id FROM activities WHERE id = ${id}
+    `;
 
-    if (!activity) {
+    if (rows.length === 0) {
       return NextResponse.json(
         { error: "Aktiviteten hittades inte" },
         { status: 404 }
       );
     }
+
+    const activity = rows[0];
 
     // Bygg attribut
     const attributes: Record<string, string | boolean> = {
@@ -82,7 +69,7 @@ export async function POST(
       body: JSON.stringify({
         email,
         attributes,
-        listIds: [activity.brevoListId],
+        listIds: [activity.brevo_list_id],
         updateEnabled: true,
       }),
     });
@@ -103,7 +90,7 @@ export async function POST(
             },
             body: JSON.stringify({
               attributes,
-              listIds: [activity.brevoListId],
+              listIds: [activity.brevo_list_id],
             }),
           }
         );

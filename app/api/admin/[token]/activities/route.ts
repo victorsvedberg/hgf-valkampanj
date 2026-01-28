@@ -1,39 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readFileSync, writeFileSync } from "fs";
-import { join } from "path";
+import { sql } from "@/lib/db";
 
-const DATA_PATH = join(process.cwd(), "data/activities.json");
 const BREVO_FOLDER_NAME = "Aktiviteter";
-
-interface Activity {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  time: string;
-  location: string;
-  postnummer: string;
-  kommun: string;
-  kommunKod: string;
-  lan: string;
-  isOnline: boolean;
-  brevoListId: number;
-  createdAt: string;
-}
-
-interface ActivitiesData {
-  folderId: number | null;
-  activities: Activity[];
-}
-
-function readData(): ActivitiesData {
-  const content = readFileSync(DATA_PATH, "utf-8");
-  return JSON.parse(content);
-}
-
-function writeData(data: ActivitiesData): void {
-  writeFileSync(DATA_PATH, JSON.stringify(data, null, 2));
-}
 
 function validateToken(token: string): boolean {
   return token === process.env.ADMIN_SECRET_TOKEN;
@@ -41,10 +9,13 @@ function validateToken(token: string): boolean {
 
 // Skapa eller hämta "Aktiviteter"-mappen i Brevo
 async function getOrCreateFolder(): Promise<number> {
-  const data = readData();
+  // Försök hämta befintlig folder-id från en aktivitet
+  const existing = await sql`
+    SELECT brevo_folder_id FROM activities WHERE brevo_folder_id IS NOT NULL LIMIT 1
+  `;
 
-  if (data.folderId) {
-    return data.folderId;
+  if (existing.length > 0 && existing[0].brevo_folder_id) {
+    return existing[0].brevo_folder_id;
   }
 
   // Skapa mappen
@@ -68,8 +39,6 @@ async function getOrCreateFolder(): Promise<number> {
       const foldersData = await foldersRes.json();
       const folder = foldersData.folders?.find((f: { name: string }) => f.name === BREVO_FOLDER_NAME);
       if (folder) {
-        data.folderId = folder.id;
-        writeData(data);
         return folder.id;
       }
     }
@@ -77,8 +46,6 @@ async function getOrCreateFolder(): Promise<number> {
   }
 
   const result = await response.json();
-  data.folderId = result.id;
-  writeData(data);
   return result.id;
 }
 
@@ -113,8 +80,35 @@ export async function GET(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const data = readData();
-  return NextResponse.json({ activities: data.activities });
+  try {
+    const rows = await sql`
+      SELECT * FROM activities ORDER BY date ASC
+    `;
+
+    const activities = rows.map((row) => ({
+      id: row.id,
+      title: row.title,
+      description: row.description || "",
+      date: row.date,
+      time: row.time,
+      location: row.location || "",
+      postnummer: row.postnummer || "",
+      kommun: row.kommun || "",
+      kommunKod: row.kommun_kod || "",
+      lan: row.lan || "",
+      isOnline: row.is_online || false,
+      brevoListId: row.brevo_list_id,
+      createdAt: row.created_at,
+    }));
+
+    return NextResponse.json({ activities });
+  } catch (error) {
+    console.error("Error fetching activities:", error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Något gick fel" },
+      { status: 500 }
+    );
+  }
 }
 
 // POST - Skapa ny aktivitet
@@ -148,8 +142,24 @@ export async function POST(
     const brevoListId = await createBrevoList(listName, folderId);
 
     // Skapa aktivitet
-    const activity: Activity = {
-      id: crypto.randomUUID(),
+    const id = crypto.randomUUID();
+    const createdAt = new Date().toISOString();
+
+    await sql`
+      INSERT INTO activities (
+        id, title, description, date, time, location,
+        postnummer, kommun, kommun_kod, lan, is_online,
+        brevo_list_id, brevo_folder_id, created_at
+      )
+      VALUES (
+        ${id}, ${title}, ${description || ""}, ${date}, ${time}, ${location || ""},
+        ${postnummer || ""}, ${kommun || ""}, ${kommunKod || ""}, ${lan || ""}, ${isOnline || false},
+        ${brevoListId}, ${folderId}, ${createdAt}
+      )
+    `;
+
+    const activity = {
+      id,
       title,
       description: description || "",
       date,
@@ -161,13 +171,8 @@ export async function POST(
       lan: lan || "",
       isOnline: isOnline || false,
       brevoListId,
-      createdAt: new Date().toISOString(),
+      createdAt,
     };
-
-    // Spara
-    const data = readData();
-    data.activities.push(activity);
-    writeData(data);
 
     return NextResponse.json({ success: true, activity }, { status: 201 });
   } catch (error) {

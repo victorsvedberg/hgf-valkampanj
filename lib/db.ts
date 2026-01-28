@@ -28,6 +28,26 @@ export function sql(
 }
 
 /**
+ * Activity type definition
+ */
+export interface Activity {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  location: string;
+  postnummer: string;
+  kommun: string;
+  kommun_kod: string;
+  lan: string;
+  is_online: boolean;
+  brevo_list_id: number;
+  brevo_folder_id: number | null;
+  created_at: string;
+}
+
+/**
  * Initialize database tables
  * Run this once to set up the schema
  */
@@ -58,6 +78,32 @@ export async function initializeDatabase() {
   await sql`
     CREATE INDEX IF NOT EXISTS idx_signatures_petition_created
     ON signatures(petition_id, created_at DESC)
+  `;
+
+  // Create activities table
+  await sql`
+    CREATE TABLE IF NOT EXISTS activities (
+      id TEXT PRIMARY KEY,
+      title TEXT NOT NULL,
+      description TEXT,
+      date DATE NOT NULL,
+      time TIME NOT NULL,
+      location TEXT,
+      postnummer VARCHAR(5),
+      kommun TEXT,
+      kommun_kod VARCHAR(4),
+      lan TEXT,
+      is_online BOOLEAN DEFAULT false,
+      brevo_list_id INTEGER NOT NULL,
+      brevo_folder_id INTEGER,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
+  // Create index for efficient date filtering
+  await sql`
+    CREATE INDEX IF NOT EXISTS idx_activities_date
+    ON activities(date)
   `;
 
   console.log("Database initialized successfully");

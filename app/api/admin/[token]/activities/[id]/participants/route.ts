@@ -1,24 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readFileSync } from "fs";
-import { join } from "path";
-
-const DATA_PATH = join(process.cwd(), "data/activities.json");
-
-interface Activity {
-  id: string;
-  brevoListId: number;
-  [key: string]: unknown;
-}
-
-interface ActivitiesData {
-  folderId: number | null;
-  activities: Activity[];
-}
-
-function readData(): ActivitiesData {
-  const content = readFileSync(DATA_PATH, "utf-8");
-  return JSON.parse(content);
-}
+import { sql } from "@/lib/db";
 
 function validateToken(token: string): boolean {
   return token === process.env.ADMIN_SECRET_TOKEN;
@@ -50,12 +31,15 @@ export async function GET(
 
   try {
     // Hitta aktiviteten
-    const data = readData();
-    const activity = data.activities.find((a) => a.id === id);
+    const rows = await sql`
+      SELECT id, brevo_list_id FROM activities WHERE id = ${id}
+    `;
 
-    if (!activity) {
+    if (rows.length === 0) {
       return NextResponse.json({ error: "Aktivitet hittades inte" }, { status: 404 });
     }
+
+    const activity = rows[0];
 
     // Hämta deltagare från Brevo
     const url = new URL(request.url);
@@ -63,7 +47,7 @@ export async function GET(
     const offset = parseInt(url.searchParams.get("offset") || "0");
 
     const response = await fetch(
-      `https://api.brevo.com/v3/contacts/lists/${activity.brevoListId}/contacts?limit=${limit}&offset=${offset}`,
+      `https://api.brevo.com/v3/contacts/lists/${activity.brevo_list_id}/contacts?limit=${limit}&offset=${offset}`,
       {
         headers: { "api-key": process.env.BREVO_API_KEY! },
       }
