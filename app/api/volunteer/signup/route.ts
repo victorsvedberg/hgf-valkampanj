@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit, getClientIp, getVolunteerLimiter } from "@/lib/rate-limit";
 
 // Lista för volontärer/aktiva medlemmar
 const VOLUNTEER_LIST_ID = 7; // Skapa i Brevo: "Aktiva medlemmar 2026"
@@ -17,6 +18,13 @@ interface VolunteerSignupRequest {
 }
 
 export async function POST(request: NextRequest) {
+  // Rate limiting
+  const rateLimitResponse = await checkRateLimit(
+    getVolunteerLimiter(),
+    getClientIp(request)
+  );
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const body: VolunteerSignupRequest = await request.json();
 

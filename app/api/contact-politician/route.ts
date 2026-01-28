@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit, getClientIp, getContactLimiter } from "@/lib/rate-limit";
 
 interface ContactPoliticianRequest {
   userName: string;
@@ -11,6 +12,13 @@ interface ContactPoliticianRequest {
 }
 
 export async function POST(request: NextRequest) {
+  // Rate limiting
+  const rateLimitResponse = await checkRateLimit(
+    getContactLimiter(),
+    getClientIp(request)
+  );
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const body: ContactPoliticianRequest = await request.json();
 

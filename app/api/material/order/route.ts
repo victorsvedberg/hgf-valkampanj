@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit, getClientIp, getMaterialLimiter } from "@/lib/rate-limit";
 
 // Lista för materialbeställningar
 const MATERIAL_LIST_ID = 6;
@@ -16,6 +17,13 @@ interface MaterialOrderRequest {
 }
 
 export async function POST(request: NextRequest) {
+  // Rate limiting
+  const rateLimitResponse = await checkRateLimit(
+    getMaterialLimiter(),
+    getClientIp(request)
+  );
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const body: MaterialOrderRequest = await request.json();
 

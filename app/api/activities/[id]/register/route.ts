@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
+import { checkRateLimit, getClientIp, getActivityLimiter } from "@/lib/rate-limit";
 
 interface RegisterRequest {
   firstName: string;
@@ -13,6 +14,13 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Rate limiting
+  const rateLimitResponse = await checkRateLimit(
+    getActivityLimiter(),
+    getClientIp(request)
+  );
+  if (rateLimitResponse) return rateLimitResponse;
+
   const { id } = await params;
 
   try {

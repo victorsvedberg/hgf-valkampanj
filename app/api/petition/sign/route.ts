@@ -4,6 +4,7 @@ import {
   getPetition,
   DEFAULT_PETITION_ID,
 } from "@/lib/signatures";
+import { checkRateLimit, getClientIp, getPetitionLimiter } from "@/lib/rate-limit";
 
 interface PetitionSignRequest {
   firstName: string;
@@ -13,6 +14,13 @@ interface PetitionSignRequest {
 }
 
 export async function POST(request: NextRequest) {
+  // Rate limiting
+  const rateLimitResponse = await checkRateLimit(
+    getPetitionLimiter(),
+    getClientIp(request)
+  );
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const body: PetitionSignRequest = await request.json();
 
