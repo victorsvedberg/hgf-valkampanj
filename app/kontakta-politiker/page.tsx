@@ -52,17 +52,19 @@ const politiciansByKommun: Record<string, Array<{
   ],
 };
 
-const defaultMessage = `Hej,
+const defaultMessage = `Olá!
 
-Jag skriver till dig angående hotet om marknadshyror. Som hyresgäst är jag orolig för vad marknadshyror skulle innebära för mig och andra hyresgäster.
+Escrevo porque quero saber a sua posição sobre uma questão que me afeta diretamente: as rendas de mercado.
 
-Marknadshyror skulle leda till kraftigt höjda hyror, särskilt i attraktiva områden. Det skulle slå hårt mot alla som inte har råd att köpa sin bostad.
+A minha casa é um apartamento arrendado. Não é uma segunda escolha – é uma escolha ativa. Eu gosto de viver em arrendamento. Mas se as rendas de mercado se tornarem realidade, a minha renda pode disparar, e de repente já não se trata de onde quero viver – mas de onde tenho condições para viver.
 
-Jag vill veta: Hur ställer du dig till marknadshyror? Kommer du att arbeta för att stoppa införandet av marknadshyror?
+Esta não é apenas a minha realidade. Centenas de milhares de inquilinos na Suécia estão na mesma situação. E estamos a ouvir atentamente o que vocês, políticos, dizem antes das eleições.
 
-Tack för ditt svar.
+A minha pergunta direta: Vai trabalhar para travar as rendas de mercado – sim ou não?
 
-Med vänlig hälsning`;
+Aguardo a sua resposta.
+
+Com os melhores cumprimentos`;
 
 type Politician = {
   name: string;
